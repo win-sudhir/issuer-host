@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration PUBLIC "-//APACHE//DTD LOG4J 1.2//EN" "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<log4j:configuration>
+
+<!-- Console Appender -->
+
+<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+
+    <param name="Target" value="System.out" />
+
+    <layout class="org.apache.log4j.PatternLayout">
+
+        <param name="ConversionPattern" value="(%F:%L) - %5p - %m%n" />
+
+    </layout>
+
+</appender>
+
+<!-- 200 MB = 209715200 Bytes -->
+
+<appender name="InfoFileAppender" class="org.apache.log4j.rolling.RollingFileAppender">
+    <rollingPolicy class="org.apache.log4j.rolling.TimeBasedRollingPolicy">
+      <param name="ActiveFileName" value="/home/tolllogs/netc_issuer_Info.log" />
+      <param name="FileNamePattern" value="/home/tolllogs/Archive/netc_issuer_Info_%d{ddMMyyyy}_%i.log.gz" />
+    </rollingPolicy>
+    <triggeringPolicy
+        class="org.apache.log4j.rolling.SizeBasedTriggeringPolicy">
+        <param name="MaxFileSize" value="209715200" />
+    </triggeringPolicy>
+    <layout class="org.apache.log4j.PatternLayout">
+    <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss:SSS} - (%F:%L) - %p - %m%n" />
+    </layout>
+    <!-- <filter class="org.apache.log4j.varia.LevelRangeFilter">
+      <param name="levelMin" value="INFO" />
+      <param name="levelMax" value="INFO" />
+    </filter> -->
+</appender>
+
+<appender name="ErrorFileAppender" class="org.apache.log4j.rolling.RollingFileAppender">
+    <param name="Threshold" value="ERROR" />
+    <rollingPolicy class="org.apache.log4j.rolling.TimeBasedRollingPolicy">
+        <param name="ActiveFileName" value="/home/tolllogs/netc_issuer_Error.log" />
+        <param name="FileNamePattern" value="/home/tolllogs/Archive/netc_issuer_Error_%d{ddMMyyyy}_%i.log.gz" />
+    </rollingPolicy>
+    <triggeringPolicy
+        class="org.apache.log4j.rolling.SizeBasedTriggeringPolicy">
+        <param name="MaxFileSize" value="209715200" />
+    </triggeringPolicy>
+    <layout class="org.apache.log4j.PatternLayout">
+        <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss:SSS} - (%F:%L) - %p - %m%n" />
+    </layout>
+</appender>
+
+<root>
+    <level value="INFO" />
+    <appender-ref ref="InfoFileAppender" />
+    <appender-ref ref="ErrorFileAppender" />
+    <appender-ref ref="CONSOLE" />
+</root>
+
+
+</log4j:configuration>
