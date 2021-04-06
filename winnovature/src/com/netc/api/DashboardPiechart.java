@@ -35,9 +35,8 @@ public class DashboardPiechart extends HttpServlet {
 
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//		JSONObject jsonRequest = new JSONObject();
+
 		PrintWriter out = response.getWriter();
-//		StringBuffer stringBuffer = new StringBuffer();
 		String finalResponse = null;
 		Gson gson = new GsonBuilder().create();
 		DashboardDTO dashboardDTO = new DashboardDTO();
@@ -53,7 +52,7 @@ public class DashboardPiechart extends HttpServlet {
 				response.setStatus(403);
 				return;
 			}			
-			dashboardDTO = new DashboardDAO().getDashboardDetails();
+			dashboardDTO = new DashboardDAO().getDashboardDetails(conn);
 			finalResponse = gson.toJson(dashboardDTO);
 			log.info("*****************Response to user/dashboardpiecharts API()****************");
 			out.write(finalResponse);

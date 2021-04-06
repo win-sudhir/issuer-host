@@ -1,5 +1,7 @@
 package com.winnovature.utils;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -20,4 +22,22 @@ public class DateUtils {
     	String validUpto = yearLater.toString() + time;
     	return validUpto;
     }
+	
+	public static String getCurrentTime(String pattern) {
+		return new SimpleDateFormat(pattern).format(new Date());
+	}
+
+	public static String getUniqueIssuerId() {
+		return new SimpleDateFormat("YYDDDHHss").format(new Date())+ getRandomNumber3Digit();
+	}
+	
+	public static String getRandomNumber3Digit()
+	  {
+	    SecureRandom random = new SecureRandom();
+	    return new BigInteger(130, random).toString().substring(0, 5); //change by ashish 19-082019
+	  }
+	
+	public static void main(String[] args) {
+		System.out.println(getRandomNumber3Digit());
+	}
 }

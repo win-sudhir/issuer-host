@@ -40,8 +40,6 @@ public class GetCityState extends HttpServlet {
 		try {
 
 			conn = DatabaseManager.getAutoCommitConnection();
-			// responseDTO = SessionValidation.validateSession(request.getHeader("userId"),
-			// request.getHeader("Authorization"), conn);
 
 			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"),
 					request.getHeader("Authorization"), conn);
@@ -50,18 +48,19 @@ public class GetCityState extends HttpServlet {
 				response.setStatus(403);
 				return;
 			}
+			
 			if (type.equalsIgnoreCase("city"))//
 			{
-				cityState = dao.getCityList(rtoCode);
+				cityState = dao.getCityList(rtoCode, conn);
 			} else if (type.equalsIgnoreCase("state"))//
 			{
-				cityState = dao.getStateList(rtoCode);
+				cityState = dao.getStateList(rtoCode, conn);
 			} else if (type.equalsIgnoreCase("cityAll"))// NA
 			{
-				cityState = dao.getAllCityList(rtoCode);
+				cityState = dao.getAllCityList(rtoCode, conn);
 			} else if (type.equalsIgnoreCase("stateAll"))// NA
 			{
-				cityState = dao.getAllStateList(rtoCode);
+				cityState = dao.getAllStateList(rtoCode, conn);
 			}
 			out.write(cityState.toString());
 			log.info("*****************Response to GetCityState API()****************");
@@ -70,7 +69,7 @@ public class GetCityState extends HttpServlet {
 			log.info("--------------------------------------------------------------------------------");
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.info("Exception occured in GetCityState.java");
+			log.error("Exception occured in GetCityState.java", e);
 		} finally {
 			DatabaseManager.commitConnection(conn);
 			MemoryComponent.closePrintWriter(out);

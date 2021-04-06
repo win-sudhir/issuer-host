@@ -40,5 +40,5 @@ public class WINConstants {
 	public static String CHECKERROLEID = "11";
 	public static String CUSTOMERROLEID = "2";
 	public static String AGENTROLEID = "7";
-	public static String BRANCHROLEID = "7";
+	public static String BRANCHROLEID = "6";
 }

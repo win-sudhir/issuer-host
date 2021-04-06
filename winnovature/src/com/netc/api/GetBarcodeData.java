@@ -57,9 +57,9 @@ public class GetBarcodeData extends HttpServlet {
 			jo = new JSONObject();
 
 			String userId = request.getHeader("userId").toString();
-			getBarCode = dm.getBarcode(userId, vehicleNumber);
+			getBarCode = dm.getBarcode(userId, vehicleNumber, conn);
 			out.write(getBarCode);
-			
+
 		} catch (Exception e) {
 			jo.put("message", e.getMessage());
 			jo.put("status", "0");

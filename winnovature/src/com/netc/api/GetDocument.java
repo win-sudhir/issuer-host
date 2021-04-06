@@ -39,9 +39,7 @@ public class GetDocument extends HttpServlet {
 		try {
 
 			conn = DatabaseManager.getAutoCommitConnection();
-			// responseDTO = SessionValidation.validateSession(request.getHeader("userId"),
-			// request.getHeader("Authorization"), conn);
-
+			
 			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"),
 					request.getHeader("Authorization"), conn);
 
@@ -49,6 +47,7 @@ public class GetDocument extends HttpServlet {
 				response.setStatus(403);
 				return;
 			}
+			
 			BufferedReader reader = request.getReader();
 			while ((line = reader.readLine()) != null) {
 				sbuff.append(line);
@@ -60,7 +59,7 @@ public class GetDocument extends HttpServlet {
 			String reqType = jreq.getString("reqType");
 			String customerId = jreq.getString("customerId");
 
-			jresp = new DocumentDao().getDocumnetDetails(customerId, reqType);
+			jresp = new DocumentDao().getDocumnetDetails(customerId, reqType, conn);
 			out.write(jresp.toString());
 		} catch (Exception e) {
 			log.error("Error in get base64 document " + e.getMessage());

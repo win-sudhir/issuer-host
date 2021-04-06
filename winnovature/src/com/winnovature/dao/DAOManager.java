@@ -294,18 +294,16 @@ public class DAOManager {
 		return jo;
 	}
 
-	public String getAllSuppliers() {
+	public String getAllSuppliers(Connection conn) {
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
-
 		JSONObject suppliers = null;
 		JSONArray supplier = null;
 		String query = null;
 		try {
-			con = DatabaseManager.getConnection();// new DBConnection().getConnection();
+
 			query = "SELECT * from supplier_master where is_deleted=?";
-			ps = con.prepareStatement(query);
+			ps = conn.prepareStatement(query);
 			ps.setString(1, "0");
 
 			rs = ps.executeQuery();
@@ -342,20 +340,15 @@ public class DAOManager {
 		} catch (Exception e) {
 
 			log.error("DAOManager.java Getting Exception   :::    ", e);
-		}
-
-		finally {
+		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
 		}
 		return supplier.toString();
 	}
 
-	public String getAllSupplierList(String userid) {
+	public String getAllSupplierList(String userid, Connection conn) {
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
 		JSONObject jo = null;
 
@@ -363,9 +356,9 @@ public class DAOManager {
 		String query = null;
 		try {
 			log.info("DAOManager.java   :: getAllSupplierList()  ::: ");
-			con = DatabaseManager.getConnection();// new DBConnection().getConnection();
+
 			query = "select supplier_id,supplier_name from supplier_master where is_deleted=? order by created_on desc";
-			ps = con.prepareStatement(query);
+			ps = conn.prepareStatement(query);
 			ps.setString(1, "0");
 
 			rs = ps.executeQuery();
@@ -380,37 +373,30 @@ public class DAOManager {
 			}
 
 		} catch (Exception e) {
-
 			log.error("DAOManager.java Getting Exception   :::    ", e);
-		}
-
-		finally {
+		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
 		}
 		return report.toString();
 	}
 
-	public String getSingleSupplierData(String supplierId, String userid) {
+	public String getSingleSupplierData(String supplierId, String userid, Connection conn) {
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
 		JSONObject jo = null;
-
 		String query = null;
 		try {
-			con = DatabaseManager.getConnection();// new DBConnection().getConnection();
+
 			// changes for maker and checker //19-06-2019
 			if (userid.equalsIgnoreCase("admin") || userid.startsWith("STCH")) {
 				query = "select supplier_id from supplier_master where supplier_id=? and is_deleted=? and is_approved<2 order by created_on desc limit 20";
-				ps = con.prepareStatement(query);
+				ps = conn.prepareStatement(query);
 				ps.setString(1, supplierId);
 				ps.setString(2, "0");
 			} else if (userid.startsWith("ST")) {
 				query = "select supplier_id from supplier_master where supplier_id=? and is_deleted=? and created_by=? order by created_on desc";
-				ps = con.prepareStatement(query);
+				ps = conn.prepareStatement(query);
 				ps.setString(1, supplierId);
 				ps.setString(2, "0");
 				ps.setString(3, userid);
@@ -434,8 +420,6 @@ public class DAOManager {
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
 		}
 
 		return jo.toString();
@@ -1731,45 +1715,35 @@ public class DAOManager {
 		return mainObj.toString();
 	}
 
-	public String getBarcode(String userId, String vehicleNumber) {
+	public String getBarcode(String userId, String vehicleNumber, Connection conn) {
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
 		String tagclassId = null;
 		String isCommercial = null;
-		// String isCommercialval= null;
 		JSONObject jo = null;
 
 		JSONArray barcodeData = null;
 		String query = null;
 		try {
-			con = DatabaseManager.getConnection();// new DBConnection().getConnection();
 
-			tagclassId = getTagclassID(vehicleNumber);
-			isCommercial = getIsCommercial(vehicleNumber);
+			tagclassId = getTagclassID(vehicleNumber, conn);
+			isCommercial = getIsCommercial(vehicleNumber, conn);
 			log.info("tagclassId : " + tagclassId);
 			log.info("isCommercial : " + isCommercial);
 
 			if (userId.equalsIgnoreCase("admin") || userId.startsWith("ST")) {
 				query = "select vtl.tid,vtl.barcode_data from vehicle_tag_linking vtl inner join inventory_master im on vtl.tid = im.tid where im.status = ? and vtl.tag_class_id= ? and ((vtl.vehicle_number is null and vtl.customer_id is null) or ( vtl.vehicle_number ='' and vtl.customer_id ='')) and ((im.branch_id = '0' or im.branch_id = '') and (im.agent_id = '0' or im.agent_id = ''))";
-				ps = con.prepareStatement(query);
+				ps = conn.prepareStatement(query);
 				ps.setString(1, "3");
 				ps.setString(2, tagclassId);
 			} else if (userId.startsWith("A")) {
 				query = "select vtl.tid,vtl.barcode_data from vehicle_tag_linking vtl inner join inventory_master im on vtl.tid = im.tid "
 						+ "where im.status = ? and vtl.tag_class_id= ? and im.agent_id = ? and ((vtl.vehicle_number is null and vtl.customer_id is null) or ( vtl.vehicle_number ='' and vtl.customer_id =''))";
-				ps = con.prepareStatement(query);
+				ps = conn.prepareStatement(query);
 				ps.setString(1, "3");
 				ps.setString(2, tagclassId);
 				ps.setString(3, userId);
-			} /*
-				 * else { query =
-				 * "select vtl.tid,vtl.barcode_data from vehicle_tag_linking vtl inner join inventory_master im on vtl.tid = im.tid "
-				 * +
-				 * "where im.status = ? and vtl.tag_class_id= ? and im.branch_id = ? and ((vtl.vehicle_number is null and vtl.customer_id is null) or ( vtl.vehicle_number ='' and vtl.customer_id =''))"
-				 * ; ps = con.prepareStatement(query); ps.setString(1, "3"); ps.setString(2,
-				 * tagclassId); ps.setString(3, userId); }
-				 */
+			}
 
 			log.info("QUERY : " + query);
 			rs = ps.executeQuery();
@@ -1791,8 +1765,6 @@ public class DAOManager {
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
 		}
 		JSONObject mainObj = new JSONObject();
 		mainObj.put("barCodeData", barcodeData);
@@ -1801,76 +1773,60 @@ public class DAOManager {
 		return mainObj.toString();
 	}
 
-	private String getIsCommercial(String vno) {
+	private String getIsCommercial(String vno, Connection conn) {
 		String isCommercial = null;
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
-
 		String query = null;
 		try {
-			con = DatabaseManager.getConnection();
-			if (con != null) {
-				query = "select is_commercial from customer_vehicle_info where vehicle_number  = ? and status=? ";
-				ps = con.prepareStatement(query);
-				ps.setString(1, vno);
-				ps.setString(2, "ACTIVE");
 
-				rs = ps.executeQuery();
+			query = "select is_commercial from customer_vehicle_info where vehicle_number  = ? and status=? ";
+			ps = conn.prepareStatement(query);
+			ps.setString(1, vno);
+			ps.setString(2, "ACTIVE");
 
-				while (rs.next()) {
-					isCommercial = rs.getString("is_commercial");
-				}
-				log.info("DAOManager.java getIsCommercial() return isCommercial :: " + isCommercial
-						+ "  against the VehicleNo  :::  " + vno + " from customer_vehicle_info ");
+			rs = ps.executeQuery();
 
-			} else {
-				log.info("DAOManager.java connection is null");
+			while (rs.next()) {
+				isCommercial = rs.getString("is_commercial");
 			}
+			log.info("DAOManager.java getIsCommercial() return isCommercial :: " + isCommercial
+					+ "  against the VehicleNo  :::  " + vno + " from customer_vehicle_info ");
+
 		} catch (Exception e) {
 			log.error("DAOManager.java Getting Exception   :::    ", e);
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
 		}
 		return isCommercial;
 	}
 
-	public String getTagclassID(String vno) {
+	public String getTagclassID(String vno, Connection conn) {
 		String tagClassID = null;
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
-
 		String query = null;
 		try {
-			con = DatabaseManager.getConnection();// new DBConnection().getConnection();
-			if (con != null) {
-				query = "select tag_class_id from customer_vehicle_info where vehicle_number  = ? and status=? ";
-				ps = con.prepareStatement(query);
-				ps.setString(1, vno);
-				ps.setString(2, "ACTIVE");
-				rs = ps.executeQuery();
 
-				if (rs.next()) {
-					tagClassID = rs.getString("tag_class_id");
+			query = "select tag_class_id from customer_vehicle_info where vehicle_number  = ? and status=? ";
+			ps = conn.prepareStatement(query);
+			ps.setString(1, vno);
+			ps.setString(2, "ACTIVE");
+			rs = ps.executeQuery();
 
-				}
-				log.info("DAOManager.java getTagclassID() return tag_class_id :: " + tagClassID
-						+ "  against the VehicleNo  :::  " + vno + " from customer_vehicle_info ");
+			if (rs.next()) {
+				tagClassID = rs.getString("tag_class_id");
 
-			} else {
-				log.info("DAOManager.java connection is null");
 			}
+			log.info("DAOManager.java getTagclassID() return tag_class_id :: " + tagClassID
+					+ "  against the VehicleNo  :::  " + vno + " from customer_vehicle_info ");
+
 		} catch (Exception e) {
 			log.error("DAOManager.java Getting Exception   :::    ", e);
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
 		}
 		return tagClassID;
 	}
@@ -2794,13 +2750,12 @@ public class DAOManager {
 		return isadded;
 	}
 
-	public String getDashboard(String userId, String roleId, String todaysDate, String yDate) {
-		Connection conn = null;
+	public String getDashboard(String userId, String roleId, String todaysDate, String yDate, Connection conn) {
 
 		CallableStatement cs = null;
 		JSONObject jo = new JSONObject();
 		try {
-			conn = DatabaseManager.getConnection();// new DBConnection().getConnection();
+
 			String sql = "{CALL pr_dashboard(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
 			cs = conn.prepareCall(sql);
 			cs.setString(1, userId);
@@ -2847,8 +2802,6 @@ public class DAOManager {
 			log.error("DAOManager.java Getting Exception   :::    ", e);
 		} finally {
 			DatabaseManager.closeCallableStatement(cs);
-			DatabaseManager.closeConnection(conn);
-
 		}
 		return jo.toString();
 

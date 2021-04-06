@@ -71,7 +71,7 @@ public class Dashboard extends HttpServlet {
 
 			if (userId != null && !userId.equalsIgnoreCase("") && !userId.startsWith("C") && !userId.startsWith("B")) {
 				log.info("Dashbord.java   :::  With User ID Param user id :: " + userId);
-				dashboard = dm.getDashboard(userId, "1", currdate, yestdate);
+				dashboard = dm.getDashboard(userId, "1", currdate, yestdate, conn);
 				out.write(dashboard);
 
 			} else if (userId.startsWith("C")) {

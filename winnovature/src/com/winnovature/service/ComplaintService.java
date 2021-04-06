@@ -50,8 +50,6 @@ public class ComplaintService {
 	}
 	
 	public ResponseDTO getCompliantReport(String fromDate, String toDate, String userId, Connection conn) {
-		fromDate = fromDate+" 00:00:00";
-		toDate = toDate+" 23:59:59";
 		List<ComplaintDTO> data = ComplaintDAO.getComplaintReport(userId, fromDate, toDate, conn);
 		responseDTO.setData(data);
 		responseDTO.setStatus(ResponseDTO.success);

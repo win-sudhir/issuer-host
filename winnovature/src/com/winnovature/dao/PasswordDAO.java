@@ -24,7 +24,7 @@ public class PasswordDAO {
 
 		try {
 			con = DatabaseManager.getConnection();// new
-															// DBConnection().getConnection();
+													// DBConnection().getConnection();
 
 			if (con != null) {
 
@@ -72,7 +72,7 @@ public class PasswordDAO {
 		log.info("validateOldPassword Query ::" + sql);
 		try {
 			conn = DatabaseManager.getConnection();// new
-																// DBConnection().getConnection();
+													// DBConnection().getConnection();
 			if (conn != null) {
 
 				String pass = PropertyReader.sha256(oldPassword.getBytes());
@@ -101,64 +101,50 @@ public class PasswordDAO {
 		return status;
 	}
 
-	public boolean updatePassword(String userId, String oldPassword, String newPassword) {
+	public boolean updatePassword(String userId, String oldPassword, String newPassword, Connection conn) {
 		boolean status = false;
-		Connection con = null;
 		PreparedStatement ps = null;
 		int i = 0;
 
 		try {
-			con = DatabaseManager.getConnection();// new
-															// DBConnection().getConnection();
-			if (con != null) {
 
-				String pass = PropertyReader.sha256(newPassword.getBytes());
+			String pass = PropertyReader.sha256(newPassword.getBytes());
 
-				String oldpass = PropertyReader.sha256(oldPassword.getBytes());
+			String oldpass = PropertyReader.sha256(oldPassword.getBytes());
 
-				String query = "update user_master set password = ? where user_id = ? and password = ? ";
-				ps = con.prepareStatement(query);
-				ps.setString(1, pass);
-				ps.setString(2, userId);
-				ps.setString(3, oldpass);
-				i = ps.executeUpdate();
-				if (i > 0) {
+			String query = "update user_master set password = ? where user_id = ? and password = ? ";
+			ps = conn.prepareStatement(query);
+			ps.setString(1, pass);
+			ps.setString(2, userId);
+			ps.setString(3, oldpass);
+			i = ps.executeUpdate();
+			if (i > 0) {
 
-					Map hm = new HashMap();
-					hm.put("USERID", userId);
-					hm.put("NEWPASSWORD", newPassword);
-					hm.put("STATUS", "SUCCESS");
+				Map hm = new HashMap();
+				hm.put("USERID", userId);
+				hm.put("NEWPASSWORD", newPassword);
+				hm.put("STATUS", "SUCCESS");
 
-					/*
-					 * AuditTrailDao auditTrailDao = new AuditTrailDao();
-					 * auditTrailDao.addAuditData(userId, userId,
-					 * "USERCHANGEPASSWORD","CHANGESUCCESS", hm, current_date);
-					 */
-					log.info("PasswordResetChangeDao.java    ::::  Update Password in user_master");
+				/*
+				 * AuditTrailDao auditTrailDao = new AuditTrailDao();
+				 * auditTrailDao.addAuditData(userId, userId,
+				 * "USERCHANGEPASSWORD","CHANGESUCCESS", hm, current_date);
+				 */
+				log.info("PasswordResetChangeDao.java    ::::  Update Password in user_master");
 
-					PasswordManager.insertUserHistory(userId, newPassword);
+				PasswordManager.insertUserHistory(userId, newPassword);
 
-					status = true;
-					log.info("PasswordResetChangeDao.java    ::::  Update Password in user_master");
-					log.info("PasswordResetChangeDao.java    ::::  updatePassword() :: in userId :: " + userId
-							+ "  ,  password  :: " + newPassword);
+				status = true;
+				log.info("PasswordResetChangeDao.java    ::::  Update Password in user_master");
+				log.info("PasswordResetChangeDao.java    ::::  updatePassword() :: in userId :: " + userId
+						+ "  ,  password  :: " + newPassword);
 
-				}
-
-			} else {
-				log.info("PasswordResetChangeDao.java    :::::: updatePassword()  Connection is null...!!!");
 			}
 
-		}
-
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.error("Getting Exception   :::    ", e);
-		}
-
-		finally {
+		} finally {
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
 		}
 
 		return status;
@@ -174,7 +160,7 @@ public class PasswordDAO {
 		log.info("validateEmailId Query ::" + sql);
 		try {
 			conn = DatabaseManager.getConnection();// new
-																// DBConnection().getConnection();
+													// DBConnection().getConnection();
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, email_id);
 			ps.setString(2, userId);
@@ -197,9 +183,8 @@ public class PasswordDAO {
 		return status;
 	}
 
-	public boolean validateNewPasswordHistory(String newPassword, String userId) {
+	public boolean validateNewPasswordHistory(String newPassword, String userId, Connection conn) {
 		boolean status = false;
-		Connection conn = null;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
 		log.info("PasswordResetChangeDao.java  ::::  Check new password in history");
@@ -207,24 +192,16 @@ public class PasswordDAO {
 		String sql = "SELECT user_id,password FROM tbl_user_history where password = ? and user_id = ? limit 5";
 		log.info("validateNewPasswordHistory Query ::" + sql);
 		try {
-			conn = DatabaseManager.getConnection();// new
-																// DBConnection().getConnection();
-			if (conn != null) {
-				ps = conn.prepareStatement(sql);
-				ps.setString(1, newPassword);
-				ps.setString(2, userId);
-				rs = ps.executeQuery();
-				if (rs.next()) {
-					status = true;
-					log.info("PasswordResetChangeDao.java :: Found new password in tbl_user_history.");
-				}
 
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, newPassword);
+			ps.setString(2, userId);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				status = true;
+				log.info("PasswordResetChangeDao.java :: Found new password in tbl_user_history.");
 			}
 
-			else {
-				status = false;
-				log.info("PasswordResetChangeDao.java :: validateNewPasswordHistory() connection is null !!!");
-			}
 		} catch (Exception e) {
 			log.info("PasswordResetChangeDao.java ::: Error while checking new password in tbl_user_history records"
 					+ e.getMessage());
@@ -232,8 +209,6 @@ public class PasswordDAO {
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(conn);
-
 		}
 		return status;
 	}

@@ -24,22 +24,19 @@ import com.winnovature.utils.MemoryComponent;
 @WebServlet("/supplier/get")
 public class GetSupplierList extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	static Logger log = Logger.getLogger(GetSupplierList.class.getName());   
-   
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	static Logger log = Logger.getLogger(GetSupplierList.class.getName());
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
 
 		JSONObject jo = new JSONObject();
-		//StringBuffer jb = new StringBuffer();
-		//String line = null;
 		log.info("GetSupplierList>>>");
 		String supplierList = null;
 		Connection conn = null;
 		try {
 
 			conn = DatabaseManager.getAutoCommitConnection();
-			// responseDTO = SessionValidation.validateSession(request.getHeader("userId"),
-			// request.getHeader("Authorization"), conn);
 
 			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"),
 					request.getHeader("Authorization"), conn);
@@ -49,41 +46,21 @@ public class GetSupplierList extends HttpServlet {
 				return;
 			}
 			DAOManager dm = new DAOManager();
-			/*
-			 * BufferedReader reader = request.getReader(); while ((line =
-			 * reader.readLine()) != null) { jb.append(line); }
-			 */
 
-			/*
-			 * CommonComponent.closeBufferedReader(reader); 
-			 */
-			//log.info(" auth token " + request.getHeader("Authorization").toString());
-			
 			String supplierId = request.getParameter("supplierId");
-			
-			String userId = request.getHeader("userId").toString();
-			//String auth_token = request.getHeader("Authorization").toString();
 
-			//if (userId != null && auth_token != null && LoginDao.isValidSession(userId, auth_token)) {
-				if (supplierId == null) {
-					log.info("GetSupplierList>>> ALL");
-					supplierList = dm.getAllSupplierList(userId);
-				} 
-				else if (supplierId.equalsIgnoreCase("all")) {
-					log.info("GetSupplierList>>> ALL");
-					supplierList = dm.getAllSuppliers();
-				}
-				else {
-					supplierList = dm.getSingleSupplierData(supplierId, userId);
-				}
-				out.write(supplierList);
-			/*
-			 * }
-			 * 
-			 * else { jo.put("flag", "0"); out.write(jo.toString());
-			 * 
-			 * }
-			 */
+			String userId = request.getHeader("userId").toString();
+
+			if (supplierId == null) {
+				log.info("GetSupplierList>>> ALL");
+				supplierList = dm.getAllSupplierList(userId, conn);
+			} else if (supplierId.equalsIgnoreCase("all")) {
+				log.info("GetSupplierList>>> ALL");
+				supplierList = dm.getAllSuppliers(conn);
+			} else {
+				supplierList = dm.getSingleSupplierData(supplierId, userId, conn);
+			}
+			out.write(supplierList);
 
 		} catch (Exception e) {
 			jo.put("message", e.getMessage());

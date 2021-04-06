@@ -3,12 +3,15 @@ package com.winnovature.service;
 import java.sql.Connection;
 
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 import com.winnovature.dao.CustomerDAO;
+import com.winnovature.dao.TxnDao;
 import com.winnovature.dao.WalletTransactionDAO;
 import com.winnovature.dto.CustomerDTO;
 import com.winnovature.dto.ResponseDTO;
 import com.winnovature.dto.TransactionDTO;
+import com.winnovature.dto.TxnResponseDTO;
 import com.winnovature.utils.PropertyReader;
 import com.winnovature.utils.Server2ServerCall;
 import com.winnovature.validation.TransactionErrorCode;
@@ -116,5 +119,10 @@ public class TransactionService {
 		String sms = "Hi sudhir? How are you?";
 		sms = sms.replaceAll(" ", "%20");
 		System.out.println(sms);
+	}
+
+	public static TxnResponseDTO addTxn(Connection conn, JSONObject jsonRequest) {
+		
+		return TxnDao.addTxn(conn, jsonRequest);
 	}
 }
