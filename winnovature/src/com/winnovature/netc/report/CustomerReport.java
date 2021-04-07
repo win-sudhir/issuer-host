@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.winnovature.dao.CheckSession;
 import com.winnovature.dao.NETCReportsDAO;
 import com.winnovature.dto.ResponseDTO;
 import com.winnovature.utils.MemoryComponent;
@@ -39,9 +40,13 @@ public class CustomerReport extends HttpServlet {
 		try {
 			conn = DatabaseManager.getAutoCommitConnection();
 
-			//responseDTO = SessionValidation.validateSession(request.getHeader("userId"),
-			//		request.getHeader("Authorization"), conn);
-			String userId = "admin";
+			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"),
+					request.getHeader("Authorization"), conn);
+			if (!checkSession) {
+				response.setStatus(403);
+				return;
+			}
+			String userId = request.getHeader("userId");
 			//finalResponse = gson.toJson(responseDTO);
 			responseDTO.setStatus("1");
 			if (responseDTO.getStatus().equals(ResponseDTO.success)) {
