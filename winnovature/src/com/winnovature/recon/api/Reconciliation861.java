@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.winnovature.dao.CheckSession;
 import com.winnovature.dao.ReconDAO;
 import com.winnovature.dto.Recon861DTO;
 import com.winnovature.dto.ResponseDTO;
@@ -45,10 +46,15 @@ public class Reconciliation861 extends HttpServlet {
 		Connection conn = null;
 		try {
 			conn = DatabaseManager.getAutoCommitConnection();
-			
-			responseDTO = SessionValidation.validateSession(request.getHeader("userId"), request.getHeader("Authorization"), conn);
-			finalResponse = gson.toJson(responseDTO);
-			if(responseDTO.getStatus().equals(ResponseDTO.success)){
+			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"), request.getHeader("Authorization"), conn);
+			if (!checkSession) {
+				response.setStatus(403);
+				return;
+			}
+			//responseDTO.setStatus("1");
+			//responseDTO = SessionValidation.validateSession(request.getHeader("userId"), request.getHeader("Authorization"), conn);
+			//finalResponse = gson.toJson(responseDTO);
+			//if(responseDTO.getStatus().equals(ResponseDTO.success)){
 				
 				stringBuffer = RequestReaderUtility.getStringBufferRequest(request);
 				jsonRequest = new JSONObject(stringBuffer.toString());
@@ -102,7 +108,7 @@ public class Reconciliation861 extends HttpServlet {
 					finalResponse = gson.toJson(responseDTO);
 				}
 
-			} 
+			//} 
 			
 			
 		} catch (Exception e) {

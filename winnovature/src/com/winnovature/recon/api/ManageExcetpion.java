@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
+import com.winnovature.dao.CheckSession;
 import com.winnovature.dao.TagDetailsDAO;
 import com.winnovature.service.NPCICallService;
 import com.winnovature.service.NPCIXMLParser;
@@ -49,6 +50,12 @@ public class ManageExcetpion extends HttpServlet
 		Connection conn = null;
 		try {
 			conn = DatabaseManager.getAutoCommitConnection();
+			
+			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"), request.getHeader("Authorization"), conn);
+			if (!checkSession) {
+				response.setStatus(403);
+				return;
+			}
 			
 			jsonObject = new JSONObject(jb.toString());
 			String opid = jsonObject.getString("opid");						

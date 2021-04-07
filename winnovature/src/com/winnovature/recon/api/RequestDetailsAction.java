@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.winnovature.dao.CheckSession;
 import com.winnovature.dto.ResponseDTO;
 import com.winnovature.dto.TagInfoDTO;
 import com.winnovature.service.XMLParserService;
@@ -44,11 +45,16 @@ public class RequestDetailsAction extends HttpServlet {
 		try {
 			
 			conn = DatabaseManager.getAutoCommitConnection();
-			responseDTO = SessionValidation.validateSession(request.getHeader("userId"),request.getHeader("Authorization"), conn);
+			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"), request.getHeader("Authorization"), conn);
+			if (!checkSession) {
+				response.setStatus(403);
+				return;
+			}
+			//responseDTO = SessionValidation.validateSession(request.getHeader("userId"),request.getHeader("Authorization"), conn);
 
-			finalResponse = gson.toJson(responseDTO);
+			//finalResponse = gson.toJson(responseDTO);
 			
-			if(responseDTO.getStatus().equals(ResponseDTO.success)) {
+			//if(responseDTO.getStatus().equals(ResponseDTO.success)) {
 
 				stringBuffer = RequestReaderUtility.getStringBufferRequest(request);
 				jsonRequest = new JSONObject(stringBuffer.toString());
@@ -77,7 +83,7 @@ public class RequestDetailsAction extends HttpServlet {
 					finalResponse = gson.toJson(responseDTO);
 				}
 
-			}
+			//}
 
 			log.info("*****************Response to /tag/npcirequestdetails API()****************");
 			out.write(finalResponse);

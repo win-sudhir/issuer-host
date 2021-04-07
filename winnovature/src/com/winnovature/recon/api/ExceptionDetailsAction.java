@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.winnovature.dao.CheckSession;
 import com.winnovature.dao.TagDetailsDAO;
 import com.winnovature.dto.ResponseDTO;
 import com.winnovature.dto.TagInfoDTO;
@@ -42,12 +43,18 @@ public class ExceptionDetailsAction extends HttpServlet {
 		try {
 			
 			conn = DatabaseManager.getAutoCommitConnection();
-			responseDTO = SessionValidation.validateSession(request.getHeader("userId"),
-					request.getHeader("Authorization"), conn);
+			//responseDTO = SessionValidation.validateSession(request.getHeader("userId"),
+				//	request.getHeader("Authorization"), conn);
+			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"), request.getHeader("Authorization"), conn);
+			if (!checkSession) {
+				response.setStatus(403);
+				return;
+			}
+			//responseDTO.setStatus("1");
 
-			finalResponse = gson.toJson(responseDTO);
-			// responseDTO.setStatus("1");
-			if (responseDTO.getStatus().equals(ResponseDTO.success)) {
+			//finalResponse = gson.toJson(responseDTO);
+			//responseDTO.setStatus("1");
+			//if (responseDTO.getStatus().equals(ResponseDTO.success)) {
 
 				stringBuffer = RequestReaderUtility.getStringBufferRequest(request);
 				jsonRequest = new JSONObject(stringBuffer.toString());
@@ -96,7 +103,7 @@ public class ExceptionDetailsAction extends HttpServlet {
 					finalResponse = gson.toJson(responseDTO);
 				}
 
-			}
+			//}
 
 			log.info("*****************Response to /tag/npicexception API()****************");
 			out.write(finalResponse);
