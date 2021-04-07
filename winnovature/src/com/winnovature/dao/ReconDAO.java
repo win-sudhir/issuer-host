@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.winnovature.dto.Recon861DTO;
 import com.winnovature.dto.Recon861DTO.TransactionInfoDTO;
@@ -679,9 +681,39 @@ public class ReconDAO {
 
 
 	public static String getExceptionView(String fileName, Connection conn) {
-		// TODO Auto-generated method stub
-		return null;
+		JSONArray arr = new JSONArray();
+		ResultSet rs = null;
+		PreparedStatement ps = null;
+		log.info("FILENAME " + fileName);
+
+		try {
+
+			String sql = "SELECT * from exception_txns_master WHERE file_name=?";
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, fileName);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				//id, transaction_ID, transaction_Date_and_Time, transaction_Type, original_transaction_ID, tag_ID, merchant_Id, reader_Read_Date_and_Time, issuer_ID, transaction_Amount, acquirer_ID, vehicle_Registration_number, reason, recon_date, cycle, process_date, file_name
+				JSONObject jo = new JSONObject();
+				jo.put("txnId", rs.getString("transaction_ID"));
+				jo.put("acqTxnId", rs.getString("original_transaction_ID"));
+				jo.put("txnDateTime", rs.getString("transaction_Date_and_Time"));
+				jo.put("vehicleNumber", rs.getString("vehicle_Registration_number"));
+				jo.put("txnAmount", rs.getString("transaction_Amount"));
+				jo.put("tagId", rs.getString("tag_ID"));
+				jo.put("tollPlazaId", rs.getString("merchant_Id"));
+				jo.put("reconProcessDate", rs.getString("process_date"));
+				jo.put("reason", rs.getString("reason"));
+
+				arr.put(jo);
+			}
+		} catch (Exception e) {
+			log.info("Exception in recon exception view : " + e.getMessage());
+		} finally {
+			DatabaseManager.closeResultSet(rs);
+			DatabaseManager.closePreparedStatement(ps);
+		}
+		return arr.toString();
 	}
-	
 		
 }
