@@ -48,8 +48,8 @@ public class CustomerReport extends HttpServlet {
 			}
 			String userId = request.getHeader("userId");
 			//finalResponse = gson.toJson(responseDTO);
-			responseDTO.setStatus("1");
-			if (responseDTO.getStatus().equals(ResponseDTO.success)) {
+			//responseDTO.setStatus("1");
+			//if (responseDTO.getStatus().equals(ResponseDTO.success)) {
 				stringBuffer = RequestReaderUtility.getStringBufferRequest(request);
 				jsonRequest = new JSONObject(stringBuffer.toString());
 				log.info("REQUEST :: " + jsonRequest);
@@ -74,7 +74,7 @@ public class CustomerReport extends HttpServlet {
 				log.info("operation" + operation);
 				*/
 				finalResponse = new NETCReportsDAO().getCUSTOMERReport(fromDate, toDate, userId, conn);
-			}
+			//}
 		} catch (Exception e) {
 			log.error(e);
 			log.info(e.getMessage());

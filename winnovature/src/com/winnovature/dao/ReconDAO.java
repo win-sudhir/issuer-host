@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -208,7 +207,7 @@ public class ReconDAO {
 				return responseDTO;
 			}
 			
-			if(!reconNPCI(recon861DTO.getReconDate(), recon861DTO.getReconCycle(), conn).equalsIgnoreCase(ResponseDTO.success)){
+			if(!reconNPCI(recon861DTO.getReconDate(), recon861DTO.getReconCycle(), recon861DTO.getFileName(), conn).equalsIgnoreCase(ResponseDTO.success)){
 				responseDTO.setStatus(ResponseDTO.failure);
 				responseDTO.setMessage(ReconErrorCode.RECONBU0011.getErrorMessage());
 				responseDTO.setErrorCode(ReconErrorCode.RECONBU0011.name());
@@ -395,7 +394,7 @@ public class ReconDAO {
 		return ResponseDTO.failure;
 	}
 	
-	private static String reconNPCI(String reconDate, String reconCycle, Connection conn)
+	private static String reconNPCI(String reconDate, String reconCycle, String fileName, Connection conn)
 	{
 		CallableStatement cs = null;
 		//Connection conn = null;
@@ -413,6 +412,7 @@ public class ReconDAO {
 			cs = conn.prepareCall(query);
 			cs.setString(1, finalDate);
 			cs.setString(2, reconCycle);
+			cs.setString(3, fileName);
 			cs.execute();
 			//conn.commit();
 			result = ResponseDTO.success;
@@ -447,6 +447,7 @@ public class ReconDAO {
 			if (rs.next()) {
 				ReconSummaryDTO reconSummaryDTO = new ReconSummaryDTO();
 				//txn.setRec_date(rs.getDate("recon_date"));
+				reconSummaryDTO.setFileName(rs.getString("file_name"));
 				reconSummaryDTO.setReconCycle(rs.getString("recon_cycle"));
 				reconSummaryDTO.setTotalFileRecord(rs.getString("total_file_rec"));
 				reconSummaryDTO.setTotalMatchRecord(rs.getString("total_match_rec"));
@@ -454,6 +455,7 @@ public class ReconDAO {
 				reconSummaryDTO.setAlreadyRecon(rs.getString("already_recon"));
 				reconSummaryDTO.setDeemedAccepted(rs.getString("deemed_accepted"));
 				reconSummaryDTO.setRemark(rs.getString("remarks"));
+				reconSummaryDTO.setStatus(rs.getString("status"));
 				summaryList.add(reconSummaryDTO);
 			}
 
@@ -488,7 +490,7 @@ public class ReconDAO {
 				
 				ReconSummaryDTO reconSummaryDTO = new ReconSummaryDTO();
 				Date date = dt.parse(rs.getString("recon_date")); 
-				
+				reconSummaryDTO.setFileName(rs.getString("file_name"));
 				reconSummaryDTO.setReconCycle(rs.getString("recon_cycle"));
 				reconSummaryDTO.setTotalFileRecord(rs.getString("total_file_rec"));
 				reconSummaryDTO.setTotalMatchRecord(rs.getString("total_match_rec"));
@@ -497,6 +499,7 @@ public class ReconDAO {
 				reconSummaryDTO.setDeemedAccepted(rs.getString("deemed_accepted"));
 				reconSummaryDTO.setRemark(rs.getString("remarks"));
 				reconSummaryDTO.setReconDate(dt1.format(date));
+				reconSummaryDTO.setStatus(rs.getString("status"));
 				summaryList.add(reconSummaryDTO);
 			}
 
@@ -531,7 +534,7 @@ public class ReconDAO {
 				ReconSummaryDTO reconSummaryDTO = new ReconSummaryDTO();
 				//txn.setRec_date(rs.getDate("recon_date"));
 				Date date = dt.parse(rs.getString("recon_date")); 
-				
+				reconSummaryDTO.setFileName(rs.getString("file_name"));
 				reconSummaryDTO.setReconCycle(rs.getString("recon_cycle"));
 				reconSummaryDTO.setTotalFileRecord(rs.getString("total_file_rec"));
 				reconSummaryDTO.setTotalMatchRecord(rs.getString("total_match_rec"));
@@ -540,6 +543,7 @@ public class ReconDAO {
 				reconSummaryDTO.setDeemedAccepted(rs.getString("deemed_accepted"));
 				reconSummaryDTO.setRemark(rs.getString("remarks"));
 				reconSummaryDTO.setReconDate(dt1.format(date));
+				reconSummaryDTO.setStatus(rs.getString("status"));
 				summaryList.add(reconSummaryDTO);
 			}
 
@@ -671,6 +675,12 @@ public class ReconDAO {
 		//}
 		
 		return responseDTO;
+	}
+
+
+	public static String getExceptionView(String fileName, Connection conn) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 		

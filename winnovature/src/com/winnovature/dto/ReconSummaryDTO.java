@@ -17,7 +17,8 @@ public class ReconSummaryDTO implements Serializable {
 	private String deemedAccepted;
 	private String remark;
 	private String reconDate;
-	
+	private String fileName;
+	private String status;
 	public String getReconCycle() {
 		return reconCycle;
 	}
@@ -65,6 +66,18 @@ public class ReconSummaryDTO implements Serializable {
 	}
 	public void setReconDate(String reconDate) {
 		this.reconDate = reconDate;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 	

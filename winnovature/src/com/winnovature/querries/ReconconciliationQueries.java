@@ -32,7 +32,7 @@ public class ReconconciliationQueries {
 			+ "vehicle_Registration_number, vehicle_Class, vehicle_Type, tag_status, tag_Issue_Date" + ") "
 			+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-	public static String getProcRecon841Query = "{call pr_recon_npci(?,?)}";
+	public static String getProcRecon841Query = "{call pr_recon_npci(?,?,?)}";
 	public static String getRecon841SumaryQuery = "SELECT * FROM npci_recon_summary order by id desc limit 1";
 	public static String getReconSkippedListQuery = "SELECT on_date,cycle FROM npci_recon_status WHERE file_name='skipped' ORDER BY STR_TO_DATE(on_date, '%d/%m/%Y') DESC";
 	public static String getReconRevokedListQuery = "SELECT on_date,cycle FROM bank_recon_status ORDER BY STR_TO_DATE(on_date, '%d/%m/%Y') DESC";
