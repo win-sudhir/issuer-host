@@ -125,4 +125,8 @@ public class TransactionService {
 		
 		return TxnDao.addTxn(conn, jsonRequest);
 	}
+	
+	public static TxnResponseDTO getTxn(Connection conn, String txnId) {
+		return TxnDao.getTxn(conn, txnId);
+	}
 }

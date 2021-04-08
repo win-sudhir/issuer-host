@@ -2,6 +2,7 @@ package com.winnovature.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -79,6 +80,50 @@ public class TxnDao {
 			e.printStackTrace();
 		}
 		finally {
+			DatabaseManager.closePreparedStatement(ps);
+		}
+		return txnResponse;
+	}
+	
+	public static TxnResponseDTO getTxn(Connection conn, String txnId) {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		TxnResponseDTO txnResponse = new TxnResponseDTO();
+		String query = null;
+		try {
+			query = "SELECT message_identifier, txn_id, txn_type, tag_id, tid, toll_plaza_id, toll_plaza_name, reader_ts, "
+					+ "txn_amount, vehicle_no, is_commercial, cbs_reference_no, cbs_response_date, avc FROM tollpay.req_pay_master where txn_id = ?";
+
+			ps = conn.prepareStatement(query);
+			ps.setString(1, txnId);
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+
+				txnResponse.setTollTxnId(rs.getString("message_identifier"));
+				txnResponse.setTxnId(rs.getString("txn_id"));
+				txnResponse.setTxnType(rs.getString("txn_type"));
+				txnResponse.setTagId(rs.getString("tag_id"));
+				txnResponse.settId(rs.getString("tid"));
+				txnResponse.setTollPlazaId(rs.getString("toll_plaza_id"));
+				txnResponse.setTollPlazaName(rs.getString("toll_plaza_name"));
+				txnResponse.setTxnTime(rs.getString("reader_ts"));
+				txnResponse.setAmount(rs.getString("txn_amount"));
+				txnResponse.setRespCode(rs.getString("00"));
+				txnResponse.setRespMessage(rs.getString("Success"));
+				txnResponse.setVehicleNo(rs.getString("vehicle_no"));
+				txnResponse.setCbsId(rs.getString("cbs_reference_no"));
+				txnResponse.setCbsResponseTime(rs.getString("cbs_response_date"));
+				txnResponse.setIsCommercial(rs.getString("is_commercial"));
+				txnResponse.setVehicleClass(rs.getString("avc"));
+
+			}
+		} catch (Exception e) {
+			log.error("Exception in getting list of getAgentList() :: " + e.getMessage());
+			log.error(e);
+			e.printStackTrace();
+		} finally {
+			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
 		}
 		return txnResponse;
