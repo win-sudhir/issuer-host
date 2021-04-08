@@ -24,6 +24,7 @@ public class ResponseDTO implements Serializable {
 	private KycDTO kyc;
 	private UserDTO user;
 	private AgentDTO agent;
+	private PurchaseOrderDTO purchaseOrder;
 
 	private List<ReconSummaryDTO> reconSummary;
 	private List<ReconDates> dateList;
@@ -215,6 +216,14 @@ public class ResponseDTO implements Serializable {
 
 	public void setAgent(AgentDTO agent) {
 		this.agent = agent;
+	}
+
+	public PurchaseOrderDTO getPurchaseOrder() {
+		return purchaseOrder;
+	}
+
+	public void setPurchaseOrder(PurchaseOrderDTO purchaseOrder) {
+		this.purchaseOrder = purchaseOrder;
 	}
 
 }
