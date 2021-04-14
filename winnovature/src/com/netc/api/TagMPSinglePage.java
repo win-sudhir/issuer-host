@@ -51,8 +51,7 @@ public class TagMPSinglePage extends HttpServlet {
 		try {
 			conn = DatabaseManager.getAutoCommitConnection();
 
-			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"),
-					request.getHeader("Authorization"), conn);
+			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"),request.getHeader("Authorization"), conn);
 			if (!checkSession) {
 				response.setStatus(403);
 				return;
@@ -62,7 +61,7 @@ public class TagMPSinglePage extends HttpServlet {
 			jsonRequest = new JSONObject(stringBuffer.toString());
 			log.info("REQUEST :: " + jsonRequest);
 
-			TagSinglePageDTO tagSignedData = TagSinglePageService.getTagSignedData(conn, jsonRequest);
+			TagSinglePageDTO tagSignedData = new TagSinglePageService().getTagSignedData(conn, jsonRequest);
 			finalResponse = gson.toJson(tagSignedData);
 			
 		} catch (Exception e) {
@@ -72,8 +71,9 @@ public class TagMPSinglePage extends HttpServlet {
 			log.info("*****************Response to /customer/add API()****************");
 			out.write(finalResponse);
 			log.info(finalResponse);
-			DatabaseManager.commitConnection(conn);
 			MemoryComponent.closePrintWriter(out);
+			DatabaseManager.commitConnection(conn);
+			
 		}
 	}
 

@@ -92,7 +92,7 @@ public class TxnDao {
 		String query = null;
 		try {
 			query = "SELECT message_identifier, txn_id, txn_type, tag_id, tid, toll_plaza_id, toll_plaza_name, reader_ts, "
-					+ "txn_amount, vehicle_no, is_commercial, cbs_reference_no, cbs_response_date, avc FROM tollpay.req_pay_master where txn_id = ?";
+					+ "txn_amount, vehicle_no, is_commercial, cbs_reference_no, cbs_response_date, avc FROM req_pay_master where txn_id = ?";
 
 			ps = conn.prepareStatement(query);
 			ps.setString(1, txnId);
@@ -109,13 +109,14 @@ public class TxnDao {
 				txnResponse.setTollPlazaName(rs.getString("toll_plaza_name"));
 				txnResponse.setTxnTime(rs.getString("reader_ts"));
 				txnResponse.setAmount(rs.getString("txn_amount"));
-				txnResponse.setRespCode(rs.getString("00"));
-				txnResponse.setRespMessage(rs.getString("Success"));
+				txnResponse.setRespCode("00");
+				txnResponse.setRespMessage("Success");
 				txnResponse.setVehicleNo(rs.getString("vehicle_no"));
 				txnResponse.setCbsId(rs.getString("cbs_reference_no"));
 				txnResponse.setCbsResponseTime(rs.getString("cbs_response_date"));
 				txnResponse.setIsCommercial(rs.getString("is_commercial"));
 				txnResponse.setVehicleClass(rs.getString("avc"));
+				txnResponse.setVehicleNo(rs.getString("vehicle_no"));
 
 			}
 		} catch (Exception e) {

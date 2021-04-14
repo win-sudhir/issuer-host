@@ -40,28 +40,23 @@ public class AddVehicle extends HttpServlet {
 		try {
 			conn = DatabaseManager.getAutoCommitConnection();
 
-			// responseDTO = SessionValidation.validateSession(request.getHeader("userId"),
-			// request.getHeader("Authorization"), conn);
-
 			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"),
 					request.getHeader("Authorization"), conn);
-			
+
 			if (!checkSession) {
 				response.setStatus(403);
 				return;
 			}
 			finalResponse = gson.toJson(responseDTO);
-			// responseDTO.setStatus("1");
-			// if (responseDTO.getStatus().equals(ResponseDTO.success)) {
+
 			stringBuffer = RequestReaderUtility.getStringBufferRequest(request);
 			jsonRequest = new JSONObject(stringBuffer.toString());
 			log.info("REQUEST :: " + jsonRequest);
 
 			VehicleDTO vehicleDTO = new Gson().fromJson(stringBuffer.toString(), VehicleDTO.class);
 			responseDTO = CustomerService.addVehicle(conn, vehicleDTO, request.getHeader("userId"),
-					jsonRequest.getString("customerId"));// );
+					jsonRequest.getString("customerId"));
 			finalResponse = gson.toJson(responseDTO);
-			// }
 		} catch (Exception e) {
 			log.error(e);
 			log.info(e.getMessage());

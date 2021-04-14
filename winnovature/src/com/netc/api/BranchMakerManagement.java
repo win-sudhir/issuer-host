@@ -37,7 +37,6 @@ public class BranchMakerManagement extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
@@ -62,7 +61,7 @@ public class BranchMakerManagement extends HttpServlet {
 				return;
 			}
 			String ipAddress = request.getRemoteAddr();
-			
+
 			BranchService branchService = new BranchService();
 
 			stringBuffer = RequestReaderUtility.getStringBufferRequest(request);
@@ -77,7 +76,8 @@ public class BranchMakerManagement extends HttpServlet {
 				JSONObject accountInfo = jsonRequest.getJSONObject("account");
 				BranchDTO branchDTO = new Gson().fromJson(branchInfo.toString(), BranchDTO.class);
 				BranchAccountDTO branchAccountDTO = new Gson().fromJson(accountInfo.toString(), BranchAccountDTO.class);
-				responseDTO = branchService.addBranch(branchDTO, branchAccountDTO, request.getHeader("userId"), conn, ipAddress);
+				responseDTO = branchService.addBranch(branchDTO, branchAccountDTO, request.getHeader("userId"), conn,
+						ipAddress);
 			} else if (("getBranchList").equalsIgnoreCase(requestType)) {
 				responseDTO = branchService.getBranchListForMaker(conn);
 			} else if (requestType.equalsIgnoreCase("deleteBranch")) {

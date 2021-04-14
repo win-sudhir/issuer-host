@@ -11,7 +11,7 @@ import com.winnovature.dto.TagSinglePageDTO;
 public class TagSinglePageService {
 	static Logger log = Logger.getLogger(TagSinglePageService.class.getName());
 
-	public static TagSinglePageDTO getTagSignedData(Connection conn, JSONObject jsonRequest) {
+	public TagSinglePageDTO getTagSignedData(Connection conn, JSONObject jsonRequest) {
 		JSONObject tagDataResp = null;
 		TagSinglePageDTO tagSingleData = new TagSinglePageDTO();
 
@@ -26,6 +26,21 @@ public class TagSinglePageService {
 		tagSingleData.setTagClassId(jsonRequest.getString("tagClassId"));
 
 		return tagSingleData;
+	}
+
+	public TagSinglePageDTO getTagSummary() {
+		
+		TagSinglePageDTO tagSummary = new TagSinglePageDTO();
+		
+		tagSummary.setBarCode("506010-001-4040851");
+		tagSummary.setCreatedBy("admin");
+		tagSummary.setSignedData("560F8959DFEE7BF55D9BB70648F7B5CBB28C4726E95C36FC9E5D56B8B19FE790");
+		tagSummary.setTagClassId("VC4");
+		tagSummary.setTagId("34161FA8202F424203ED4498");
+		tagSummary.settId("E4161FA82032D69926004851");
+		tagSummary.setUserMemory("5858585858585858585858580400560F8959DFEE7BF55D9BB70648F7B5CBB28C4726E95C36FC9E5D56B8B19FE790");
+		return tagSummary;
+		
 	}
 
 }

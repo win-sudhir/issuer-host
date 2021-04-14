@@ -13,17 +13,16 @@ import com.winnovature.utils.DatabaseManager;
 public class TagVehicleClassDAO {
 	static Logger log = Logger.getLogger(TagVehicleClassDAO.class.getName());
 
-	public String getTagClassList() {
+	public String getTagClassList(Connection conn) {
 
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
 		JSONArray report = null;
 		String query = null;
 		try {
-			con = DatabaseManager.getConnection();
+
 			query = "SELECT id,tag_class_id, tag_color_id from tag_class_master where is_deleted = ?";
-			ps = con.prepareStatement(query);
+			ps = conn.prepareStatement(query);
 			ps.setString(1, "0");
 
 			rs = ps.executeQuery();
@@ -42,14 +41,12 @@ public class TagVehicleClassDAO {
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
 		}
 		JSONObject mainObj = new JSONObject();
 		mainObj.put("tagClasslist", report);
 		return mainObj.toString();
 	}
-	
+
 	public String getVehicleClassList() {
 
 		PreparedStatement ps = null;
@@ -87,5 +84,4 @@ public class TagVehicleClassDAO {
 		return mainObj.toString();
 	}
 
-	
 }

@@ -1,33 +1,22 @@
 package com.winnovature.dao;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import com.winnovature.utils.DatabaseManager;
-import com.winnovature.utils.PropertyReader;
 
 public class TagRegistrationDAO {
 
 	static Logger log = Logger.getLogger(TagRegistrationDAO.class.getName());
 
-	
 	/*
 	 * public String getTagId(String tid, String vno) { String tagId = null;
 	 * PreparedStatement ps = null; ResultSet rs = null; Connection con = null;
@@ -109,11 +98,10 @@ public class TagRegistrationDAO {
 		return null;
 	}
 
-	public boolean allocateTag(String TID, String VehicleNumber, String min_threshold)// adding
-																						// threshold
+	public boolean allocateTag(String TID, String VehicleNumber, String min_threshold, Connection conn)// adding
+	// threshold
 	{
 		boolean check = false;
-		Connection conn = null;
 		ResultSet rs = null;
 		Statement st = null;
 
@@ -122,7 +110,7 @@ public class TagRegistrationDAO {
 		log.info("In Allocate tag dao vehicle_tag_linking...................");
 
 		try {
-			conn = DatabaseManager.getConnection();
+
 			st = conn.createStatement();
 			rs = st.executeQuery(sql);
 			if (rs.next())// && rs1.next())
@@ -150,8 +138,6 @@ public class TagRegistrationDAO {
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closeStatement(st);
-			DatabaseManager.closeConnection(conn);
-
 		}
 		return check;
 	}
@@ -186,7 +172,7 @@ public class TagRegistrationDAO {
 		String bank_name = null;
 		String cust_id = null;
 		String vehicle_id = null;
-		//String tbl_min_threshold = null;
+		// String tbl_min_threshold = null;
 
 		String sql = "SELECT * FROM vehicle_tag_linking";
 		String sql1 = "SELECT * from customer_vehicle_info where vehicle_number='" + VehicleNumber + "'";
@@ -201,8 +187,7 @@ public class TagRegistrationDAO {
 			while (rs.next())// && rs1.next())
 			{
 				// if(rs.getString("vehicle_number")!=null)
-				if (rs.getString("tid").equals(TID))
-				{
+				if (rs.getString("tid").equals(TID)) {
 					tag_id = rs.getString("tag_id");
 					log.info("Tag ID : " + tag_id);
 					st1 = conn.createStatement();
@@ -224,7 +209,7 @@ public class TagRegistrationDAO {
 							DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 							log.info(dateFormat.format(date));// (cuurent_date));
 							current_date = dateFormat.format(date);
-							
+
 							String iinNo = "500001";
 							challan_id = iinNo + "-" + txnID + "-" + seqNO;
 							log.info("current_date : " + current_date);
@@ -296,11 +281,11 @@ public class TagRegistrationDAO {
 			 * tbl_min_threshold = rs3.getString("min_threshold"); else tbl_min_threshold =
 			 * "0"; log.info("Last Min Threshold : " + tbl_min_threshold); break; }
 			 */
-			//tbl_min_threshold = "0";
+			// tbl_min_threshold = "0";
 //			int threshold = Integer.valueOf(tbl_min_threshold) + Integer.valueOf(min_threshold);
 //			min_threshold = Integer.toString(threshold);// Integer.toString(Integer.valueOf(tbl_min_threshold)
-														// +
-														// Integer.valueOf(min_threshold));
+			// +
+			// Integer.valueOf(min_threshold));
 //			log.info("Threshold Total = " + min_threshold);
 //			String thrupdatesql = "update customer_master set min_threshold = ? where cust_id='" + cust_id + "'";
 //			preparedStmt4 = conn.prepareStatement(thrupdatesql);
@@ -365,25 +350,18 @@ public class TagRegistrationDAO {
 
 	}
 
-	public static JSONObject challanData(String TID, String VehicleNumber, String min_threshold)// adding
-																								// threshold
+	public static JSONObject challanData(String TID, String VehicleNumber, String min_threshold, Connection conn)// adding
+	// threshold
 	{
-		
+
 		JSONObject insidechallan = new JSONObject();
 
 		String BankName, ChallanId, ChassisNumber, CreatedDate, EngineNumber, TagId;
-		Connection conn = null;
 		PreparedStatement pstmt = null;
-		// Statement stmt = null;
 		ResultSet rsjson = null;
 
 		try {
 
-			conn = DatabaseManager.getConnection();
-			// stmt = conn.createStatement();
-
-			// String sqljson = "select * from challan_master where tid='"+TID
-			// +"'"+" and vehicle_number='"+VehicleNumber+"'";
 			String sqljson = "select * from challan_master where tid=? and vehicle_number= ?";
 			pstmt = conn.prepareStatement(sqljson);
 			pstmt.setString(1, TID);
@@ -409,75 +387,61 @@ public class TagRegistrationDAO {
 				insidechallan = insidechallan.put("vehicleNumber", VehicleNumber);
 				log.info("insidechallan......" + insidechallan);
 			}
-			/*
-			 * else insidechallan = insidechallan.put("Records not found",
-			 * "Challan not found");
-			 */
-		} catch (Exception e) {
-			log.error("Getting Error   :::    ", e);
-		}
-		/*
-		 * finally { rsjson = null; //conn = null; }
-		 */
 
-		/*challanobj = challanobj.put("Challan", insidechallan);
-		challanobj = challanobj.put("Status", true);*/
-		PreparedStatement preparedStmt = null;
-		String sqlupdate = "update inventory_master set status = ? where tid='" + TID + "'";
-		try {
-			conn = DatabaseManager.getConnection();
-			preparedStmt = conn.prepareStatement(sqlupdate);
-			// preparedStmt.setInt(1, 2);//(1, 2);
-			preparedStmt.setString(1, "2");
-			// preparedStmt.executeUpdate();
-			/// log.info("Status changed Successfully.........");
+			updateTagStatus(TID, conn);
 		} catch (Exception e) {
-			log.info("Something wrong while changing status ..." + e);
 			log.error("Getting Error   :::    ", e);
 		} finally {
 			DatabaseManager.closePreparedStatement(pstmt);
-			DatabaseManager.closePreparedStatement(preparedStmt);
-			DatabaseManager.closeConnection(conn);
-
 		}
 		return insidechallan;
 	}
 
-	
-	public String getIsCommercial(String vno) {
+	public static void updateTagStatus(String TID, Connection conn) {
+
+		PreparedStatement ps = null;
+		String sqlupdate = "update vehicle_tag_linking_history set tag_status = ? where tid= ? ";
+		try {
+			ps = conn.prepareStatement(sqlupdate);
+			ps.setString(1, TID);
+			ps.setString(2, "2");
+			ps.executeUpdate();
+			log.info("Status changed Successfully.........");
+		} catch (Exception e) {
+			log.info("Something wrong while changing status ..." + e);
+			log.error("Getting Error   :::    ", e);
+		} finally {
+			DatabaseManager.closePreparedStatement(ps);
+		}
+	}
+
+	public String getIsCommercial(String vno, Connection conn) {
 
 		String isCommercial = null;
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
 
 		String query = null;
 		try {
-			con = DatabaseManager.getConnection();
-			if (con != null) {
-				query = "select is_commercial from customer_vehicle_info where vehicle_number  = ? ";
-				ps = con.prepareStatement(query);
-				ps.setString(1, vno);
 
-				rs = ps.executeQuery();
+			query = "select is_commercial from customer_vehicle_info where vehicle_number  = ? ";
+			ps = conn.prepareStatement(query);
+			ps.setString(1, vno);
 
-				if (rs.next()) {
-					isCommercial = rs.getString("is_commercial");
+			rs = ps.executeQuery();
 
-				}
-				log.info("TagAllocationDao.java getIsCommercial() :::  return is_commercial :: " + isCommercial
-						+ "  against the VehicleNo  :::  " + vno + " from customer_vehicle_info ");
+			if (rs.next()) {
+				isCommercial = rs.getString("is_commercial");
 
-			} else {
-				log.info("TagAllocationDao.java getIsCommercial()  ::: connection is null");
 			}
+			log.info("TagAllocationDao.java getIsCommercial() :::  return is_commercial :: " + isCommercial
+					+ "  against the VehicleNo  :::  " + vno + " from customer_vehicle_info ");
+
 		} catch (Exception e) {
 			log.error("Getting Error   :::    ", e);
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
 		}
 		return isCommercial;
 	}
@@ -520,27 +484,25 @@ public class TagRegistrationDAO {
 		return isCommercial;
 	}
 
-	
-	public static boolean checkBalance(String vehicleNumber, String issuanceCharge, String security) {
+	public static boolean checkBalance(String vehicleNumber, String issuanceCharge, String security, Connection conn) {
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
 		double currentBalance = 0;
 		String query = null;
 		try {
-			con = DatabaseManager.getConnection();
+
 			query = "select current_balance from wallet_info w, customer_vehicle_info v, customer_info c where c.user_id=v.user_id and c.wallet_id=w.wallet_id and v.vehicle_number=?";
 			log.info("query :: " + query);
 			log.info("vehicleNumber :: " + vehicleNumber);
-			ps = con.prepareStatement(query);
+			ps = conn.prepareStatement(query);
 			ps.setString(1, vehicleNumber);
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				log.info("current_balance :: " + rs.getString("current_balance"));
-				double total = Double.valueOf(issuanceCharge)+Double.valueOf(security);
-				currentBalance =  rs.getDouble("current_balance");
-				currentBalance = currentBalance-total;
-				if(currentBalance<0) {
+				double total = Double.valueOf(issuanceCharge) + Double.valueOf(security);
+				currentBalance = rs.getDouble("current_balance");
+				currentBalance = currentBalance - total;
+				if (currentBalance < 0) {
 					return true;
 				}
 			}
@@ -551,14 +513,8 @@ public class TagRegistrationDAO {
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
 		}
 		return false;
 	}
 
-	
-
-	
-	
 }

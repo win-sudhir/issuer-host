@@ -48,7 +48,7 @@ public class TagReissuance extends HttpServlet {
 			jsonRequest = new JSONObject(stringBuffer.toString());
 			log.info("jsonRequest " + jsonRequest);
 			conn = DatabaseManager.getAutoCommitConnection();
-			
+
 			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"),
 					request.getHeader("Authorization"), conn);
 
@@ -56,6 +56,7 @@ public class TagReissuance extends HttpServlet {
 				response.setStatus(403);
 				return;
 			}
+
 			String requestType = jsonRequest.getString("requestType");
 			String vehicleNumber = jsonRequest.getString("vehicleNumber");
 			VehicleDetailsDTO vehicleDetailsDTO = null;
@@ -72,8 +73,6 @@ public class TagReissuance extends HttpServlet {
 				List<BarCodeDataDTO> data = TagReissuanceDAO.getBarcodeData(vehicleDetailsDTO.getTagClassId(), conn);
 				vehicleDetailsDTO.setData(data);
 				finalResponse = gson.toJson(vehicleDetailsDTO);
-				// vehicleDetailsDTO = TagReissuanceService.getVehicleDetails(vehicleNumber,
-				// conn);
 			}
 
 			else if (("reIssueTag").equalsIgnoreCase(requestType)) {

@@ -67,12 +67,10 @@ public class PurchaseOrderApprove extends HttpServlet {
 			log.info(" authToken " + request.getHeader("Authorization").toString());
 
 			String userId = request.getHeader("userId").toString();
-			// String auth_token = request.getHeader("Authorization").toString();
-			// if (userId != null && auth_token != null && LoginDao.isValidSession(userId,
-			// auth_token)) {
+
 			poId = jreq.getString("poId");
 
-			checkApprove = dataManager.poAuthorize(poId, userId);
+			checkApprove = dataManager.poAuthorize(poId, userId, conn);
 			if (checkApprove) {
 
 				jresp.put("message", "PO Authorized");
@@ -81,9 +79,7 @@ public class PurchaseOrderApprove extends HttpServlet {
 				jresp.put("message", "Sorry,PO Can't be Authorized...!!!");
 				jresp.put("status", "0");
 			}
-			/*
-			 * } else { jresp.put("flag", "0"); }
-			 */
+
 			out.write(jresp.toString());
 			log.info(jresp.toString());
 

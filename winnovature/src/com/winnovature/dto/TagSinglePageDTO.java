@@ -8,6 +8,8 @@ public class TagSinglePageDTO {
 	private String tagClassId;
 	private String signedData;
 	private String userMemory;
+	private String supplierId;
+	private String createdBy;
 
 	public String getTagId() {
 		return tagId;
@@ -57,10 +59,27 @@ public class TagSinglePageDTO {
 		this.userMemory = userMemory;
 	}
 
+	public String getSupplierId() {
+		return supplierId;
+	}
+
+	public void setSupplierId(String supplierId) {
+		this.supplierId = supplierId;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
 	@Override
 	public String toString() {
 		return "TagSinglePageDTO [tagId=" + tagId + ", tId=" + tId + ", barCode=" + barCode + ", tagClassId="
-				+ tagClassId + ", signedData=" + signedData + ", userMemory=" + userMemory + "]";
+				+ tagClassId + ", signedData=" + signedData + ", userMemory=" + userMemory + ", supplierId="
+				+ supplierId + ", createdBy=" + createdBy + "]";
 	}
 
 }

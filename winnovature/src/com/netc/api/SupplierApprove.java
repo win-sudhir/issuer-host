@@ -38,10 +38,9 @@ public class SupplierApprove extends HttpServlet {
 
 		StringBuffer sbuffer = new StringBuffer();
 		String line = null;
-
 		String supplier_id = null;
-
 		Connection conn = null;
+		
 		try {
 
 			conn = DatabaseManager.getAutoCommitConnection();
@@ -62,11 +61,6 @@ public class SupplierApprove extends HttpServlet {
 			jreq = new JSONObject(sbuffer.toString());
 			jresp = new JSONObject();
 
-			//String userIdS = request.getHeader("userId").toString();
-			//String auth_token = request.getHeader("Authorization").toString();
-			// if( userIdS != null && auth_token != null && LoginDao.isValidSession(userIdS,
-			// auth_token))
-			// {
 			supplier_id = jreq.getString("supplierId");
 			String userId = request.getHeader("userId").toString();
 			checkApprove = daoManager.approveSupplier(supplier_id, userId);

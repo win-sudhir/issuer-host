@@ -56,11 +56,11 @@ public class PurchaseOrderList extends HttpServlet {
 			
 			String poId = request.getParameter("poid");
 			if (poId == null) {
-				polist = dm.getPoList(userId);
+				polist = dm.getPoList(userId, conn);
 				log.info("polist ::"+polist);
 				out.write(polist.toString());
 			} else {
-				polist = dm.getSinglePoList(poId);
+				polist = dm.getSinglePoList(poId, conn);
 				log.info("polist ::"+polist);
 				out.write(polist.toString());
 			}

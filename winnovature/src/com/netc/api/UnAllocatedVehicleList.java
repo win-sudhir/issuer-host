@@ -46,25 +46,15 @@ public class UnAllocatedVehicleList extends HttpServlet {
 				response.setStatus(403);
 				return;
 			}
-			// String userId = request.getHeader("userId").toString();
-			// String auth_token = request.getHeader("Authorization").toString();
 
-			// if (userId != null && auth_token != null && LoginDao.isValidSession(userId,
-			// auth_token)) {
 			DAOManager dm = new DAOManager();
 			BufferedReader reader = request.getReader();
 			while ((line = reader.readLine()) != null) {
 				jb.append(line);
 			}
 			MemoryComponent.closeBufferedReader(reader);
-			unallocated = dm.getUnAllocatedVechicleList(customerId);
+			unallocated = dm.getUnAllocatedVechicleList(customerId, conn);
 			out.write(unallocated);
-			/*
-			 * }
-			 * 
-			 * else { JSONObject jo = new JSONObject(); jo.put("flag", "0");
-			 * out.write(jo.toString()); }
-			 */
 
 		} catch (Exception e) {
 			JSONObject jo = new JSONObject();

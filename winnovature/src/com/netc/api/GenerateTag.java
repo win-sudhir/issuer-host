@@ -33,7 +33,6 @@ public class GenerateTag extends HttpServlet {
 		StringBuffer jb = new StringBuffer();
 		String line = null;
 
-		// boolean flag = false;
 		Connection conn = null;
 		try {
 
@@ -60,7 +59,7 @@ public class GenerateTag extends HttpServlet {
 			String tagInfo = jsonObject.getString("tagInfo");
 			log.info("TAG INFORAMTION : " + tagInfo);
 			String sResp = generateTagDAO.generateTagData(tagInfo, conn);
-			log.info(" sResp ::"+sResp);
+			log.info(" sResp ::" + sResp);
 			if (sResp.equalsIgnoreCase("CS")) {
 				jo.put("message", "New tag data generated successfully.");
 			} else {

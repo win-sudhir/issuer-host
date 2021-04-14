@@ -95,7 +95,7 @@ public class RegenerateChallan extends HttpServlet {
 			String vehicleNumber = jreq.getString("vehicleNumber");
 			// String userId = jreq.getString("userId");
 			// RegenerateChallanDAO regenerateChallanDAO = new RegenerateChallanDAO();
-			JSONObject challanDetails = RegenerateChallanDAO.getChallanData(vehicleNumber);
+			JSONObject challanDetails = RegenerateChallanDAO.getChallanData(vehicleNumber, conn);
 			resp = new JSONObject();
 			if (challanDetails.getString("vehStatus").equalsIgnoreCase("present")) {
 

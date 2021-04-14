@@ -70,11 +70,10 @@ public class TagAssignment extends HttpServlet {
 			} else {
 				userid = request.getHeader("userId").toString();
 			}
-			
+
 			log.info(" User Id In Header : " + userid);
 
-			if (userid != null)
-			{
+			if (userid != null) {
 				if (userid.equalsIgnoreCase("admin") || userid.startsWith("ST")) {
 					if (jreq.has("agentId")) {
 						id = "agent_id";
@@ -98,15 +97,13 @@ public class TagAssignment extends HttpServlet {
 
 				count = jreq.getString("count");
 				startBarcode = jreq.getString("startBarCode");
-				
 
 				log.info("TagAssignment.java ::::   id : " + id + "  idValue  :: " + idValue + " , count : " + count);
 
 				if (!id.equalsIgnoreCase("NA") && idValue != null && !idValue.equals("") && count != null
 						&& !count.equals("")) {
 					tagAssignmentDAO = new TagAssignmentDAO();
-					status = tagAssignmentDAO.assignTagToUser(tagClassId, id, idValue, count, userid,
-							startBarcode); 
+					status = tagAssignmentDAO.assignTagToUser(tagClassId, id, idValue, count, userid, startBarcode, conn);
 				}
 
 				if (status.equalsIgnoreCase("1")) {
@@ -138,7 +135,7 @@ public class TagAssignment extends HttpServlet {
 		}
 
 		catch (Exception e) {
-			log.error("Getting Exception   :::    "+e);
+			log.error("Getting Exception   :::    " + e);
 			jresp.put("message", e.getMessage());
 			jresp.put("status", "0");
 			out.write(jresp.toString());

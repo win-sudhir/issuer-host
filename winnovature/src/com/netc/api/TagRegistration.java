@@ -80,7 +80,7 @@ public class TagRegistration extends HttpServlet {
 			amtRSA = "0";// js.getString("amtRSA");
 			amtSecurity = js.getString("amtSecurity");
 			amtInsurance = "0";// js.getString("amtInsurance");
-			isCommercial = tagallocationDao.getIsCommercial(vehicleNumber);
+			isCommercial = tagallocationDao.getIsCommercial(vehicleNumber, conn);
 			log.info("TagAllocation.java ::: isCommercial  : " + isCommercial);
 
 			log.info("TID : " + TID + " VehicleNumber : " + vehicleNumber + " Min Threshold : " + min_threshold);
@@ -88,12 +88,8 @@ public class TagRegistration extends HttpServlet {
 					+ "  amtSecurity : " + amtSecurity + "  amtInsurance  : " + amtInsurance);
 
 			String userId = request.getHeader("userId").toString();
-			String auth_token = request.getHeader("Authorization").toString();//
-			// if (userId != null && auth_token != null && LoginDao.isValidSession(userId,
-			// auth_token))
-			// {
-
-			if (TagRegistrationDAO.checkBalance(vehicleNumber, amtIssuence, amtSecurity)) {
+			
+			if (TagRegistrationDAO.checkBalance(vehicleNumber, amtIssuence, amtSecurity, conn)) {
 				log.info("Balance not sufficient.");
 				message = "In-sufficient balance.";
 				status = "0";
@@ -102,7 +98,7 @@ public class TagRegistration extends HttpServlet {
 				return;
 			}
 
-			isallocated = tagallocationDao.allocateTag(TID, vehicleNumber, min_threshold);
+			isallocated = tagallocationDao.allocateTag(TID, vehicleNumber, min_threshold, conn);
 			log.info("is allocated value == " + isallocated);
 			if (isallocated) {
 				message = "TID not found in the inventory";
@@ -112,7 +108,7 @@ public class TagRegistration extends HttpServlet {
 				return;
 			} else {
 
-				String XMLData = new ManageTagResponse().mngTagApiCall(TID, vehicleNumber);
+				String XMLData = new ManageTagResponse().mngTagApiCall(TID, vehicleNumber, conn);
 				JSONObject parsedXML = new TagAllocationService().parseTagAllocationProcess(XMLData);
 				if (parsedXML != null) {
 
@@ -133,12 +129,12 @@ public class TagRegistration extends HttpServlet {
 
 						isgenerated = new ManageTagResponse().allocateTagInsertChallan(TID, vehicleNumber,
 								min_threshold, txnID, seqNO, amtIssuence, amtRecharge, amtRSA, amtSecurity,
-								amtInsurance);
+								amtInsurance, conn);
 						if (isgenerated) {
 							// using normal function
 							status = "1";
 							message = "Tag registered successfully in NPCI.";
-							challan = TagRegistrationDAO.challanData(TID, vehicleNumber, min_threshold);
+							challan = TagRegistrationDAO.challanData(TID, vehicleNumber, min_threshold, conn);
 							log.info("CHALLAN return challanData :: " + challan.toString());
 
 							log.info("TID registered and allocated.................");
@@ -174,18 +170,9 @@ public class TagRegistration extends HttpServlet {
 
 			log.info("Tag Allocation Response >>>>>" + jresp.toString());
 
-			/*
-			 * }
-			 * 
-			 * else { jresp.put("flag", "0"); out.write(jresp.toString()); }
-			 */
-		} // try end
-
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.error("Exception in TagAllcation ::  ", e);
-		}
-
-		finally {
+		} finally {
 			out.write(jresp.toString());
 			DatabaseManager.commitConnection(conn);
 			MemoryComponent.closePrintWriter(out);

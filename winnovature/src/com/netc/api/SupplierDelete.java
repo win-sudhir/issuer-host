@@ -30,16 +30,13 @@ public class SupplierDelete extends HttpServlet {
 		boolean checkdelete = false;
 		JSONObject jreq = new JSONObject();
 		JSONObject jresp = new JSONObject();
-
 		PrintWriter out = response.getWriter();
 		DAOManager daoManager = new DAOManager();
-
 		StringBuffer sbuffer = new StringBuffer();
 		String line = null;
-
 		String supplier_id = null;
-
 		Connection conn = null;
+
 		try {
 
 			conn = DatabaseManager.getAutoCommitConnection();
@@ -60,18 +57,10 @@ public class SupplierDelete extends HttpServlet {
 			jreq = new JSONObject(sbuffer.toString());
 			jresp = new JSONObject();
 
-			// String userId = request.getHeader("userId").toString();
-			// String auth_token =
-			// request.getHeader("Authorization").toString();//request.getParameter("auth_token");
-
-			// if( userId != null && auth_token != null && LoginDao.isValidSession(userId,
-			// auth_token))
-			// {
 			supplier_id = jreq.getString("supplierId");
-
 			log.info("supplier id : " + supplier_id);
 
-			checkdelete = daoManager.deleteSupplier(supplier_id);
+			checkdelete = daoManager.deleteSupplier(supplier_id, conn);
 			if (checkdelete) {
 				jresp.put("message", "Supplier deleted successfully.");
 				jresp.put("status", "1");
@@ -80,9 +69,6 @@ public class SupplierDelete extends HttpServlet {
 				jresp.put("status", "0");
 			}
 
-			/*
-			 * }else{ jresp.put("flag","0"); }
-			 */
 			out.write(jresp.toString());
 			log.info(jresp.toString());
 		} catch (Exception e) {
