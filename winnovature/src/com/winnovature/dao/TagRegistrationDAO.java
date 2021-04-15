@@ -403,9 +403,9 @@ public class TagRegistrationDAO {
 				insidechallan = insidechallan.put("challanId", ChallanId);
 				insidechallan = insidechallan.put("chassisNumber", ChassisNumber);
 				insidechallan = insidechallan.put("createdDate", CreatedDate);
-				insidechallan = insidechallan.put("cngineNumber", EngineNumber);
+				insidechallan = insidechallan.put("engineNumber", EngineNumber);
 				insidechallan = insidechallan.put("tid", TID);
-				insidechallan = insidechallan.put("cagId", TagId);
+				insidechallan = insidechallan.put("tagId", TagId);
 				insidechallan = insidechallan.put("vehicleNumber", VehicleNumber);
 				log.info("insidechallan......" + insidechallan);
 			}
