@@ -90,27 +90,23 @@ public class DAOManager {
 		return approve;
 	}
 
-	public boolean deleteSupplier(String supplier_id) {
+	public boolean deleteSupplier(String supplier_id, Connection conn) {
 		boolean isdelete = false;
 
-		Connection con = null;
 		PreparedStatement preparedStmt = null;
-		String sql = "update supplier_master set is_deleted = ? where supplier_id='" + supplier_id + "'";
+
 		try {
-			con = DatabaseManager.getConnection();// new DBConnection().getConnection();
-			preparedStmt = con.prepareStatement(sql);
+
+			String sql = "update supplier_master set is_deleted = ? where supplier_id='" + supplier_id + "'";
+			preparedStmt = conn.prepareStatement(sql);
 			preparedStmt.setInt(1, 1);
 			preparedStmt.executeUpdate();
 			isdelete = true;
 			log.info("DAOManager.java  ::: deleteSupplier() Successfully deleted.........");
 		} catch (Exception e) {
 			log.info("Something went wrong while deleting..." + e);
-		}
-
-		finally {
+		} finally {
 			DatabaseManager.closePreparedStatement(preparedStmt);
-			DatabaseManager.closeConnection(con);
-
 		}
 
 		return isdelete;
@@ -575,9 +571,8 @@ public class DAOManager {
 		return mainObj.toString();
 	}
 
-	public String getPoList(String userId) {
+	public String getPoList(String userId, Connection conn) {
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
 		JSONObject jo = null;
 
@@ -585,20 +580,19 @@ public class DAOManager {
 		String query = null;
 		try {
 
-			con = DatabaseManager.getConnection();
 			if (userId.equalsIgnoreCase("admin")) {
 				// query = "select
 				// po_id,supp_id,created_on,cgst,sgst,total_order_value,po_status from po_master
 				// where po_status <=6 ORDER BY created_on desc ";
 				query = "select po.po_id,pm.order_qty, po.supp_id,po.created_on,po.cgst,po.sgst,po.total_order_value,po.po_status from po_master po, po_item_master pm where po.po_id=pm.po_id and po.po_status <=6 ORDER BY po.created_on desc";
-				ps = con.prepareStatement(query);
+				ps = conn.prepareStatement(query);
 				// ps.setInt(1,0);
 			} else {
 				// query = "select
 				// po_id,supp_id,created_on,cgst,sgst,total_order_value,po_status from po_master
 				// where po_status <=6 and supp_id=? ORDER BY created_on desc ";
 				query = "select po.po_id,pm.order_qty, po.supp_id,po.created_on,po.cgst,po.sgst,po.total_order_value,po.po_status from po_master po, po_item_master pm where po.po_id=pm.po_id and po.supp_id=? and po.po_status <=6 ORDER BY po.created_on desc";
-				ps = con.prepareStatement(query);
+				ps = conn.prepareStatement(query);
 				// ps.setInt(1,1);
 				ps.setString(1, userId);
 			}
@@ -623,13 +617,9 @@ public class DAOManager {
 		} catch (Exception e) {
 
 			log.error("DAOManager.java Getting Exception   :::    ", e);
-		}
-
-		finally {
+		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
 		}
 
 		JSONObject mainObj = new JSONObject();
@@ -637,22 +627,21 @@ public class DAOManager {
 		return mainObj.toString();
 	}
 
-	public String getSinglePoList(String poId) {
+	public String getSinglePoList(String poId, Connection conn) {
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
 		JSONObject jo = null;
 
 		JSONArray report = null;
 		String query = null;
 		try {
-			con = DatabaseManager.getConnection();
+
 			// query = "select po_id,supp_id,created_on,cgst,sgst,total_order_value from
 			// po_master where po_status = ?";
 			query = "select po.po_id,pm.order_qty, po.supp_id,po.created_on,po.cgst,po.sgst,po.total_order_value,po.po_status "
 					+ "from po_master po, po_item_master pm "
 					+ "where po.po_id=pm.po_id and po.po_status = ? and po.po_id = ?";
-			ps = con.prepareStatement(query);
+			ps = conn.prepareStatement(query);
 			ps.setInt(1, 6);
 			ps.setString(2, poId);
 
@@ -674,13 +663,9 @@ public class DAOManager {
 
 		} catch (Exception e) {
 			log.error("DAOManager.java Getting Exception   :::    ", e);
-		}
-
-		finally {
+		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
 		}
 
 		JSONObject mainObj = new JSONObject();
@@ -1361,17 +1346,15 @@ public class DAOManager {
 		return approve;
 	}
 
-	public boolean poAuthorize(String po_id, String userId) {
+	public boolean poAuthorize(String po_id, String userId, Connection conn) {
 		boolean approve = false;
 
-		Connection con = null;
 		PreparedStatement preparedStmt = null;
 		ResultSet rs = null;
 
 		String sql = "update po_master set po_status = ?,approved_on=now(), approved_by=? where po_id=?";
 		try {
-			con = DatabaseManager.getConnection();// new DBConnection().getConnection();
-			preparedStmt = con.prepareStatement(sql);
+			preparedStmt = conn.prepareStatement(sql);
 			preparedStmt.setInt(1, 1);
 			preparedStmt.setString(2, userId);
 			preparedStmt.setString(3, po_id);
@@ -1383,8 +1366,6 @@ public class DAOManager {
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(preparedStmt);
-			DatabaseManager.closeConnection(con);
-
 		}
 		return approve;
 	}
@@ -1519,10 +1500,9 @@ public class DAOManager {
 			String resiAddr1, String resiAddr2, String resiPin, String resiCity, String resiState, String businessAddr1,
 			String businessAddr2, String businessPin, String businessCity, String businessState, String accountNo,
 			String bankName, String branchAddress, String ifscCode, String accountType, String createdBy,
-			String password) {
+			String password, Connection conn) {
 		String isadded = "0";
 
-		Connection con = null;
 		PreparedStatement preparedStmt = null;
 		PreparedStatement preparedStmt1 = null;
 		PreparedStatement preparedStmt2 = null;
@@ -1537,9 +1517,7 @@ public class DAOManager {
 
 		try {
 
-			con = DatabaseManager.getConnection();// new DBConnection().getConnection();
-			con.setAutoCommit(false);
-			preparedStmt = con.prepareStatement(sql);// for sales agent master
+			preparedStmt = conn.prepareStatement(sql);// for sales agent master
 
 			preparedStmt.setString(1, supplierId);
 
@@ -1565,14 +1543,8 @@ public class DAOManager {
 			preparedStmt.setString(20, "0");
 
 			preparedStmt.executeUpdate();
-			// rs = preparedStmt.getGeneratedKeys();
-			// preparedStmt.RETURN_GENERATED_KEYS();
 
-			/*
-			 * if(rs.next()) { int id = rs.getInt(1); }
-			 */
-
-			preparedStmt1 = con.prepareStatement(sql1); // for address master
+			preparedStmt1 = conn.prepareStatement(sql1); // for address master
 			preparedStmt1.setString(1, supplierId);
 			preparedStmt1.setString(2, resiAddr1);
 			preparedStmt1.setString(3, resiAddr2);
@@ -1587,7 +1559,7 @@ public class DAOManager {
 			// preparedStmt1.setString(12, "0");
 			preparedStmt1.executeUpdate();
 
-			preparedStmt2 = con.prepareStatement(sql2);// for account master
+			preparedStmt2 = conn.prepareStatement(sql2);// for account master
 			preparedStmt2.setString(1, supplierId);
 			preparedStmt2.setString(2, accountNo);
 			preparedStmt2.setString(3, bankName);
@@ -1604,41 +1576,30 @@ public class DAOManager {
 			WinnovatureService.insertUser(supplierId, role_id, createdBy, password, emailId);
 			log.info("supplier user inserted successfully.........");
 
-			con.commit();
 			isadded = "1";
 		} catch (Exception e) {
 			isadded = "-1";
-			try {
-				con.rollback();
-				log.error("DAOManager.java :: Something wrong while insert... " + e.getMessage());
-				log.error("DAOManager.java Getting Exception   :::    ", e);
-			} catch (Exception ex) {
-				log.error("DAOManager.java :: operation rolled back... " + ex.getMessage());
-				ex.printStackTrace();
-			}
 
-		}
+			log.error("DAOManager.java :: Something wrong while insert... " + e.getMessage());
+			log.error("DAOManager.java Getting Exception   :::    ", e);
 
-		finally {
+		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(preparedStmt2);
 			DatabaseManager.closePreparedStatement(preparedStmt1);
 			DatabaseManager.closePreparedStatement(preparedStmt);
-			DatabaseManager.closeConnection(con);
-
 		}
 		return isadded;
 	}
 
-	public static boolean validateSupplierID(String email_id) {
+	public static boolean validateSupplierID(String email_id, Connection conn) {
 		boolean check = false;
-		Connection conn = null;
 		ResultSet rs = null;
 		PreparedStatement st = null;
 		String sql = "SELECT email_id FROM supplier_master where email_id=? and is_deleted=?";
 
 		try {
-			conn = DatabaseManager.getConnection();// new DBConnection().getConnection();
+
 			st = conn.prepareStatement(sql);
 			st.setString(1, email_id);
 			st.setString(2, "0");
@@ -1654,28 +1615,21 @@ public class DAOManager {
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closeStatement(st);
-			DatabaseManager.closeConnection(conn);
-
 		}
 		return check;
 	}
 
-	public String getUnAllocatedVechicleList(String customerId) {
+	public String getUnAllocatedVechicleList(String customerId, Connection conn) {
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
-
-		// String isCommercial = null;
-		// String isCommercialval= null;
 		JSONObject jo = null;
 
 		JSONArray vehicleList = null;
 		String query = null;
 		try {
-			con = DatabaseManager.getConnection();// new DBConnection().getConnection();
 
 			query = "select * from customer_vehicle_info where user_id = ? and status = ? and vehicle_number NOT IN (select vehicle_number FROM vehicle_tag_linking where customer_id = ? and (vehicle_number is not null and vehicle_number !=''))";
-			ps = con.prepareStatement(query);
+			ps = conn.prepareStatement(query);
 			ps.setString(1, customerId);
 			ps.setString(2, "ACTIVE");
 			ps.setString(3, customerId);
@@ -1690,9 +1644,6 @@ public class DAOManager {
 				jo.put("tagClassId", rs.getString("tag_class_id"));
 				jo.put("isCommercial", rs.getString("is_commercial"));
 
-				// jo.put("vehicleId", rs.getString("vehicle_id")); // future use
-				// jo.put("vehicleClassId", rs.getString("vehicle_class_id"));
-
 				vehicleList.put(jo);
 
 			}
@@ -1703,8 +1654,6 @@ public class DAOManager {
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
 		}
 
 		JSONObject mainObj = new JSONObject();

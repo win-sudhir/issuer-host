@@ -47,34 +47,15 @@ public class LoginMenus extends HttpServlet {
 			}
 			log.info("LoginMenus.java auth token " + request.getHeader("Authorization").toString());
 			MenuSubMenuDAO mdm = new MenuSubMenuDAO();
-			/*
-			 * BufferedReader reader = request.getReader(); while ((line =
-			 * reader.readLine()) != null) { jb.append(line); }
-			 * CommonComponent.closeBufferedReader(reader);
-			 */
 
-			// log.info("LoginMenus.java auth token
-			// "+request.getHeader("Authorization").toString());
 			String roleId = request.getParameter("roleId");
 			String userId = request.getHeader("userId").toString();
-			// String auth_token =
-			// request.getHeader("Authorization").toString();//request.getParameter("auth_token");
 
 			jo = new JSONObject();
 
-			// if( userId != null && auth_token != null && LoginDao.isValidSession(userId,
-			// auth_token))
-			// {
 			getMod = mdm.getLoginMenu(conn, roleId, userId);
-			// jo.put("MenuList",checkMenu);
 
 			out.write(getMod);
-			/*
-			 * }
-			 * 
-			 * else { log.info("Invalid Session : "+auth_token+"  , flag = 0 ");
-			 * jo.put("flag","0"); out.write(jo.toString()); }
-			 */
 
 		} catch (Exception e) {
 

@@ -2,6 +2,7 @@ package com.netc.api;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,15 +14,13 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import com.winnovature.dao.LoginDao;
+import com.winnovature.utils.DatabaseManager;
 import com.winnovature.utils.MemoryComponent;
-
 
 @WebServlet("/user/logout")
 public class Logout extends HttpServlet {
 	static Logger log = Logger.getLogger(Logout.class.getName());
 	private static final long serialVersionUID = 1L;
-
-	
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -35,16 +34,18 @@ public class Logout extends HttpServlet {
 		JSONObject jo = new JSONObject();
 
 		PrintWriter out = response.getWriter();
+		Connection conn = null;
 		try {
-			if (new LoginDao().deleteSessionIdLogout(userIdH, auth_tokenH)) {
+
+			conn = DatabaseManager.getAutoCommitConnection();
+
+			if (new LoginDao().deleteSessionIdLogout(userIdH, auth_tokenH, conn)) {
 				log.info("Delete Successfull");
 
 				jo.put("Message", "Successfully logged out.");
 				jo.put("Status", true);
 				log.info(jo);
-			}
-
-			else {
+			} else {
 				jo.put("Message", "userId and session id is not remove.");
 				jo.put("Status", false);
 			}

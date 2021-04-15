@@ -23,14 +23,12 @@ public class PurchaseOrderDao {
 	static Logger log = Logger.getLogger(PurchaseOrderDao.class.getName());
 
 	public boolean addPurchaseOrder(String podate, String suppid, String sgst, String cgst, String ordervalue,
-			String totalordervalue, String po_id, JSONArray po, String userId)
-	{
+			String totalordervalue, String po_id, JSONArray po, String userId, Connection conn) {
 		boolean isadded = false;
 		String tagclassid, orderqty, unitprice;// for order
-		Connection con = null;
 		PreparedStatement preparedStmt = null;
 		PreparedStatement preparedStmt1 = null;
-		
+
 		Date cuurent_date = new Date();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String date = dateFormat.format(cuurent_date);
@@ -40,9 +38,8 @@ public class PurchaseOrderDao {
 		String sql1 = "insert into po_item_master(po_id, tag_class_id, order_qty, unit_price)" + " values (?, ?, ?, ?)";
 
 		try {
-			con = DatabaseManager.getConnection();// new
-															// DBConnection().getConnection();
-			preparedStmt = con.prepareStatement(sql);// for customer vehicle
+
+			preparedStmt = conn.prepareStatement(sql);// for customer vehicle
 														// master
 			preparedStmt.setString(1, po_id);
 			preparedStmt.setString(2, podate);
@@ -60,7 +57,7 @@ public class PurchaseOrderDao {
 			preparedStmt.executeUpdate();
 			log.info("PurchaseOrderDao.java  :::   PO added in cust vehicle master.........");
 
-			preparedStmt1 = con.prepareStatement(sql1);
+			preparedStmt1 = conn.prepareStatement(sql1);
 
 			for (int i = 0; i < po.length(); i++) {
 				JSONObject order = po.getJSONObject(i);
@@ -79,18 +76,13 @@ public class PurchaseOrderDao {
 			log.info("Successfully added purchase order.........");
 			isadded = true;
 		} catch (Exception e) {
-			try {
-				con.rollback();
-				log.info("PurchaseOrderDao.java  :::  Something wrong while insert in purchase order..." + e);
-				log.error("Getting Exception   :::    ", e);
-			} catch (Exception ex) {
-				log.info("Insert operation rolled back..." + ex);
-			}
+
+			log.info("PurchaseOrderDao.java  :::  Something wrong while insert in purchase order..." + e);
+			log.error("Getting Exception   :::    ", e);
+
 		} finally {
 			DatabaseManager.closePreparedStatement(preparedStmt1);
 			DatabaseManager.closePreparedStatement(preparedStmt);
-			DatabaseManager.closeConnection(con);
-
 		}
 		return isadded;
 	}
@@ -128,7 +120,6 @@ public class PurchaseOrderDao {
 		return purchaseOrderDTO;
 	}
 
-	
 	public static List<PurchaseOrderDTO> getOrderList(Connection conn, String poId) {
 		List<PurchaseOrderDTO> lst = new ArrayList<PurchaseOrderDTO>();
 		ResultSet rs = null;
@@ -137,7 +128,7 @@ public class PurchaseOrderDao {
 			String query = "SELECT * FROM po_item_master WHERE po_id=?";
 			ps = conn.prepareStatement(query);
 			ps.setString(1, poId);
-			
+
 			rs = ps.executeQuery();
 			PurchaseOrderDTO purchaseOrderDTO = null;
 			while (rs.next()) {
@@ -184,15 +175,16 @@ public class PurchaseOrderDao {
 			int po = ps.executeUpdate();
 			log.info("PurchaseOrderDao.java  updatePurchaseOrder()");
 
-			//String tagClassId = null, orderQty = null, unitPrice = null;
+			// String tagClassId = null, orderQty = null, unitPrice = null;
 			for (int i = 0; i < orderList.length(); i++) {
-				//log.info("i = "+i);
+				// log.info("i = "+i);
 				JSONObject order = orderList.getJSONObject(i);
 				String tagClassId = order.getString("tagClassId");
 				String orderQty = order.getString("orderQty");
 				String unitPrice = order.getString("unitPrice");
 				String id = order.getString("id");
-				log.info("ID "+id+" >>>>tagclassid " + tagClassId + "  orderqty " + orderQty + "   unitprice  " + unitPrice);
+				log.info("ID " + id + " >>>>tagclassid " + tagClassId + "  orderqty " + orderQty + "   unitprice  "
+						+ unitPrice);
 				ps1 = conn.prepareStatement(sql1);
 				ps1.setString(1, tagClassId);
 				ps1.setString(2, orderQty);

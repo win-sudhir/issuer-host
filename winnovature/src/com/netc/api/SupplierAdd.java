@@ -87,11 +87,7 @@ public class SupplierAdd extends HttpServlet {
 			String createdBy = null;
 			String password = PasswordManager.getPasswordSaltString(); // GenerateRandom.randomAlphaNumeric(8);
 
-			//String userId = request.getHeader("userId").toString();
-			//String auth_token = request.getHeader("Authorization").toString();// request.getParameter("auth_token");
-
-			// if (userId != null && auth_token != null && LoginDao.isValidSession(userId,
-			// auth_token)) {
+			
 			JSONObject supplierJson = js.getJSONObject("supplier");
 			supplierName = supplierJson.getString("supplierName");
 			emailId = supplierJson.getString("emailId");
@@ -133,13 +129,13 @@ public class SupplierAdd extends HttpServlet {
 			ifscCode = account.getString("ifscCode");
 			accountType = account.getString("accountType");
 
-			if (!DAOManager.validateSupplierID(emailId)) {
+			if (!DAOManager.validateSupplierID(emailId, conn)) {
 
 				checkadd = daoManager.addSupplier(supplierId, supplierName, emailId, contactPerson, contactNumber1,
 						contactNumber2, deliveryPeriod, maxOrderQty, minOrderQty, is_npci_certified,
 						npci_certification_expiry, GSTN, webSite, status, resiAddr1, resiAddr2, resiPin, resiCity,
 						resiState, businessAddr1, businessAddr2, businessPin, businessCity, businessState, accountNo,
-						bankName, branchAddress, ifscCode, accountType, createdBy, password);
+						bankName, branchAddress, ifscCode, accountType, createdBy, password, conn);
 
 				if (checkadd.equalsIgnoreCase("1")) {
 					jresp.put("message", "Supplier Added successfully");

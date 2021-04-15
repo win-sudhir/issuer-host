@@ -31,7 +31,6 @@ public class GetAllCustomer extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
-		// StringBuffer stringBuffer = new StringBuffer();
 		String finalResponse = null;
 		ResponseDTO responseDTO = new ResponseDTO();
 		Gson gson = new GsonBuilder().create();
@@ -59,8 +58,6 @@ public class GetAllCustomer extends HttpServlet {
 				responseDTO.setData(data);
 				finalResponse = gson.toJson(responseDTO);
 			}
-			// finalResponse = gson.toJson(responseDTO);
-			// }
 		} catch (Exception e) {
 			log.error(e);
 			log.info(e.getMessage());

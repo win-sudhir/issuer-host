@@ -183,12 +183,10 @@ public class GenerateTagData {
 		log.info("GenerateTagData.java ::: TID : " + tid + " And Tag Class Id : " + tagClassId);
 
 		CallableStatement cs = null;
-		// Connection con = null;
 		JSONObject json = null;
 
 		try {
 			log.info("Before Connection");
-			// con = DatabaseManager.getConnection();
 			log.info("After Connection");
 			cs = conn.prepareCall("{CALL pr_perso_data(?,?,?,?)}");
 			cs.registerOutParameter(1, Types.VARCHAR); // Prefix number

@@ -56,13 +56,12 @@ public class PurchaseOrderUpdate extends HttpServlet {
 			JSONObject order = jsonRequest.getJSONObject("purchaseOrder");
 			PurchaseOrderDTO purchaseOrder = new Gson().fromJson(order.toString(), PurchaseOrderDTO.class);
 			JSONArray orderList = jsonRequest.getJSONArray("orderList");
-			
-			responseDTO = PurchaseOrderService.updatePurchaseOrder(conn, purchaseOrder, orderList, request.getHeader("userId"));
-			finalResponse = gson.toJson(responseDTO);
-		}
 
-		catch (Exception e) {
-			log.error("purchaseorder/update   ::  Getting Exception   :::    "+ e.getMessage());
+			responseDTO = PurchaseOrderService.updatePurchaseOrder(conn, purchaseOrder, orderList,
+					request.getHeader("userId"));
+			finalResponse = gson.toJson(responseDTO);
+		} catch (Exception e) {
+			log.error("purchaseorder/update   ::  Getting Exception   :::    " + e.getMessage());
 		} finally {
 			log.info("*****************Response to purchaseorder/update API()****************");
 			out.write(finalResponse);

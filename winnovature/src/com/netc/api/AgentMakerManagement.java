@@ -53,7 +53,7 @@ public class AgentMakerManagement extends HttpServlet {
 				return;
 			}
 			String ipAddress = request.getRemoteAddr();
-			
+
 			AgentMakerService agentMakerService = new AgentMakerService();
 			stringBuffer = RequestReaderUtility.getStringBufferRequest(request);
 			jsonRequest = new JSONObject(stringBuffer.toString());
@@ -62,7 +62,7 @@ public class AgentMakerManagement extends HttpServlet {
 			AgentDTO agentDTO = new AgentDTO();
 			String requestType = jsonRequest.getString("requestType");
 			log.info("UserManagement requestType " + requestType);
-			// customers only
+
 			if (("addAgent").equalsIgnoreCase(requestType)) {
 				JSONObject agentInfo = jsonRequest.getJSONObject("agentInfo");
 				JSONObject address = jsonRequest.getJSONObject("addressInfo");

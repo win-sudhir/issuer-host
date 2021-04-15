@@ -19,7 +19,7 @@ public class CheckSession {
 	static Logger log = Logger.getLogger(CheckSession.class.getName());
 
 	public static boolean isValidSession(String userId, String sessionId, Connection conn) {
-		// Connection conn = null;
+		
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
@@ -29,7 +29,6 @@ public class CheckSession {
 				return false;
 			}
 
-			// conn = DatabaseConnectionManager.getConnection();
 			// user_id, auth_token, rodt
 			String sql = "SELECT * FROM tbl_session_master where user_id = ? and auth_token = ?";
 			ps = conn.prepareStatement(sql);
@@ -57,8 +56,6 @@ public class CheckSession {
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			// DatabaseConnectionManager.closeConnection(conn);
-
 		}
 		return false;
 	}
@@ -109,12 +106,12 @@ public class CheckSession {
 	}
 
 	public static String getUserLoginTime(String userId, Connection conn) throws Exception {
-		// Connection conn = null;
+		
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String time = null;
 		try {
-			// conn = DatabaseConnectionManager.getConnection();
+			
 			String sql = "SELECT * FROM tbl_session_master where user_id=?";
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, userId);
@@ -128,20 +125,17 @@ public class CheckSession {
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			// DatabaseConnectionManager.closeConnection(conn);
-
 		}
 		return time;
 	}
 
 	public static void updateLoginTime(String userId, String sessionId, Connection conn) {
-		// Connection conn = null;
+		
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String current_date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 		try {
 			String sql = "UPDATE tbl_session_master set rodt=? where user_id=? and auth_token=?";
-			// conn = DatabaseConnectionManager.getConnection();
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, current_date);
 			ps.setString(2, userId);
@@ -154,8 +148,6 @@ public class CheckSession {
 		} finally {
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			// DatabaseConnectionManager.closeConnection(conn);
-
 		}
 	}
 }

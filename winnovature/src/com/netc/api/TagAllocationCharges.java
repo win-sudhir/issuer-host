@@ -53,11 +53,9 @@ public class TagAllocationCharges extends HttpServlet {
 			jresp = new JSONObject();
 			log.info("TagAllocationCharges Request :: " + jreq);
 			vehicleNumber = jreq.getString("vehicleNumber");
-			String vcId = new TagRegChargesDAO().getVehicleClass(vehicleNumber);
+			String vcId = new TagRegChargesDAO().getVehicleClass(vehicleNumber, conn);
 			if (vcId != null) {
-				// JSONObject charges = new
-				// ChargesDao().getTagAllocationCharges(vcId);
-				jresp = new TagRegChargesDAO().getTagAllocationCharges(vcId);
+				jresp = new TagRegChargesDAO().getTagAllocationCharges(vcId, conn);
 				jresp.put("status", "1");
 			} else {
 				// jresp.put("Message", "TagAllocationCharges not exists");

@@ -57,8 +57,6 @@ public class BranchCheckerManagement extends HttpServlet {
 		try {
 
 			conn = DatabaseManager.getAutoCommitConnection();
-			// responseDTO = SessionValidation.validateSession(request.getHeader("userId"),
-			// request.getHeader("Authorization"), conn);
 
 			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"),
 					request.getHeader("Authorization"), conn);
@@ -70,7 +68,6 @@ public class BranchCheckerManagement extends HttpServlet {
 			String ipAddress = request.getRemoteAddr();
 
 			BranchService branchService = new BranchService();
-			// if (responseDTO.getStatus().equals(ResponseDTO.success)) {
 
 			stringBuffer = RequestReaderUtility.getStringBufferRequest(request);
 			jsonRequest = new JSONObject(stringBuffer.toString());
@@ -81,29 +78,22 @@ public class BranchCheckerManagement extends HttpServlet {
 
 			if (("getBranchList").equalsIgnoreCase(requestType)) {
 				responseDTO = branchService.getBranchListForChecker(conn);
-				// finalResponse = gson.toJson(responseDTO);
 			} else if (requestType.equalsIgnoreCase("deleteBranch")) {
 				String branchId = jsonRequest.getString("branchId");
 				responseDTO = branchService.deleteBranchChecker(conn, branchId, request.getHeader("userId"), ipAddress);
-				// finalResponse = gson.toJson(responseDTO);
 			} else if (requestType.equalsIgnoreCase("approveBranch")) {
 				String branchId = jsonRequest.getString("branchId");
 				responseDTO = branchService.approveBranch(conn, branchId, request.getHeader("userId"), ipAddress);
-				// finalResponse = gson.toJson(responseDTO);
 			} else if (requestType.equalsIgnoreCase("rejectBranch")) {
 				String branchId = jsonRequest.getString("branchId");
 				responseDTO = branchService.rejectBranch(conn, branchId, request.getHeader("userId"), ipAddress);
-				// finalResponse = gson.toJson(responseDTO);
 			} else {
 				log.info("Invalid Request Type");
-				// ResponseDTO resp = new ResponseDTO();
 				responseDTO.setErrorCode(BranchErrorCode.WINNABU0029.name());
 				responseDTO.setMessage(BranchErrorCode.WINNABU0029.getErrorMessage());
 				responseDTO.setStatus(ResponseDTO.failure);
-				// finalResponse = gson.toJson(responseDTO);
 			}
 
-			// }
 			finalResponse = gson.toJson(responseDTO);
 			log.info("*****************Response to /agent/manageagent API()****************");
 

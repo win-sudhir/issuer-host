@@ -9,60 +9,49 @@ import org.json.JSONObject;
 
 import com.winnovature.utils.DatabaseManager;
 
-//import com.netc.utils.DBConnection;
-
-public class TagRegChargesDAO 
-{
+public class TagRegChargesDAO {
 	static Logger log = Logger.getLogger(TagRegChargesDAO.class.getName());
-	
-	public JSONObject getTagAllocationCharges(String vc_id) 
-	{
+
+	public JSONObject getTagAllocationCharges(String vc_id, Connection conn) {
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
 		JSONObject charges = null;
 		String query = null;
 		try {
-			con = DatabaseManager.getConnection();//DatabaseConnectionManager.getConnection();
+
 			query = "SELECT * from tbl_tag_allocation_charges where tag_class=?";
-			ps = con.prepareStatement(query);
-			ps.setString(1,vc_id);
+			ps = conn.prepareStatement(query);
+			ps.setString(1, vc_id);
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				charges = new JSONObject();
 				charges.put("issuanceCharge", rs.getString("issuance_charge"));
-				
 				charges.put("securityCharge", rs.getString("security_charges"));
-				
 			}
 
 		} catch (Exception e) {
 			log.error(e);
 			e.printStackTrace();
 		} finally {
-			DatabaseManager.closeConnection(con);
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			
 		}
 		return charges;
 	}
-	
-	public String getVehicleClass(String vehicleNumber) 
-	{
+
+	public String getVehicleClass(String vehicleNumber, Connection conn) {
 		PreparedStatement ps = null;
-		Connection con = null;
 		ResultSet rs = null;
 		String query = null;
 		try {
-			con = DatabaseManager.getConnection();
+
 			query = "SELECT tag_class_id FROM customer_vehicle_info WHERE vehicle_number=?";
-			ps = con.prepareStatement(query);
-			ps.setString(1,vehicleNumber);
+			ps = conn.prepareStatement(query);
+			ps.setString(1, vehicleNumber);
 			rs = ps.executeQuery();
-			if (rs.next()) 
-			{
-				log.info("Tag class id for vehicle is :: "+vehicleNumber+" tag class id :: "+rs.getString("tag_class_id"));
+			if (rs.next()) {
+				log.info("Tag class id for vehicle is :: " + vehicleNumber + " tag class id :: "
+						+ rs.getString("tag_class_id"));
 				return rs.getString("tag_class_id");
 			}
 
@@ -70,10 +59,8 @@ public class TagRegChargesDAO
 			log.error(e);
 			e.printStackTrace();
 		} finally {
-			DatabaseManager.closeConnection(con);
 			DatabaseManager.closeResultSet(rs);
 			DatabaseManager.closePreparedStatement(ps);
-			
 		}
 		return null;
 	}

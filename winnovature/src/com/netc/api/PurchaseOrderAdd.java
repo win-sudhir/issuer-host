@@ -45,8 +45,6 @@ public class PurchaseOrderAdd extends HttpServlet {
 		String tagclassid, orderqty, unitprice;// for order
 
 		JSONObject purchaseOrder = new JSONObject();
-		// agentId = "10";
-		// log.info(".............1");
 
 		Connection conn = null;
 		try {
@@ -104,7 +102,7 @@ public class PurchaseOrderAdd extends HttpServlet {
 
 			log.info("Poid  : " + po_id);
 			checkadd = poDao.addPurchaseOrder(podate, suppid, sgst, cgst, ordervalue, totalordervalue, po_id, po,
-					userId);// true;
+					userId, conn);// true;
 			// tagallocationDao.allocateTag(TID, VehicleNumber);
 			if (checkadd) {
 				jresp.put("message", "New data created Po Id : " + po_id);
@@ -116,18 +114,10 @@ public class PurchaseOrderAdd extends HttpServlet {
 				log.info("Po can not be created.................");
 			}
 
-			/*
-			 * } else{ jresp.put("flag","0"); }
-			 */
-
 			out.write(jresp.toString());
-		}
-
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.error("Getting Exception   :::    ", e);
-		}
-
-		finally {
+		} finally {
 			DatabaseManager.commitConnection(conn);
 			MemoryComponent.closePrintWriter(out);
 		}

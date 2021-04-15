@@ -42,8 +42,6 @@ public class GetBranchListForSaleAgent extends HttpServlet {
 		try {
 
 			conn = DatabaseManager.getAutoCommitConnection();
-			// responseDTO = SessionValidation.validateSession(request.getHeader("userId"),
-			// request.getHeader("Authorization"), conn);
 
 			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"),
 					request.getHeader("Authorization"), conn);
@@ -53,17 +51,11 @@ public class GetBranchListForSaleAgent extends HttpServlet {
 				return;
 			}
 
-			// if (responseDTO.getStatus().equals(ResponseDTO.success)) {
 			log.info("Inside IF Loop");
 			BranchService branchService = new BranchService();
 			List<String> branchList = branchService.getBrancgListForSaleAgent(conn);
 			responseDTO.setBranchList(branchList);
-			/*
-			 * } else { log.info("Invalid Request Type");
-			 * responseDTO.setErrorCode(BranchErrorCode.WINNABU0029.name());
-			 * responseDTO.setMessage(BranchErrorCode.WINNABU0029.getErrorMessage());
-			 * responseDTO.setStatus(ResponseDTO.failure); }
-			 */
+
 			log.info("*****************Response to branchlist/agent/manageagent API()****************");
 			finalResponse = gson.toJson(responseDTO);
 		} catch (Exception e) {
@@ -71,7 +63,6 @@ public class GetBranchListForSaleAgent extends HttpServlet {
 			log.info(e.getMessage());
 		} finally {
 			out.write(finalResponse);
-			// log.info(finalResponse);
 			DatabaseManager.commitConnection(conn);
 			MemoryComponent.closePrintWriter(out);
 		}

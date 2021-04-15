@@ -13,17 +13,14 @@ public class TagAssignmentDAO {
 	static Logger log = Logger.getLogger(TagAssignmentDAO.class.getName());
 
 	public String assignTagToUser(String tagClassId, String id, String idValue, String count, String userId,
-			String startBarcode) {
+			String startBarcode, Connection conn) {
 		String status = "-1";
-
-		Connection conn = null;
 		PreparedStatement ps1 = null, ps2 = null, ps3 = null, ps4 = null, ps = null;
 		String colIndex = null;
 		ResultSet rs1 = null, rs2 = null;
 		String qcolId = null;
 
 		try {
-			conn = DatabaseManager.getConnection();
 
 			if (userId.equalsIgnoreCase("admin") || userId.startsWith("ST")) {
 				qcolId = "select im.id from inventory_master im inner join vehicle_tag_linking vtl on vtl.tid = im.tid where im.tag_class_id = ? and im.status = ? and im.agent_id = ? and im.branch_id = ? and im.tid =(select tid from vehicle_tag_linking where vehicle_number is null and customer_id is null and barcode_data = ? and tag_class_id = ? )";
@@ -34,8 +31,8 @@ public class TagAssignmentDAO {
 				ps.setString(4, "0");
 				ps.setString(5, startBarcode);
 				ps.setString(6, tagClassId);
-			} else // branch
-			{
+			} else { // branch
+
 				qcolId = "select im.id from inventory_master im inner join vehicle_tag_linking vtl on vtl.tid = im.tid where im.tag_class_id = ? and im.status = ? and im.agent_id = ? and im.branch_id = ? and im.tid =(select tid from vehicle_tag_linking where vehicle_number is null and customer_id is null and barcode_data= ? and tag_class_id = ? )";
 				ps = conn.prepareStatement(qcolId);
 				ps.setString(1, tagClassId);
@@ -64,7 +61,6 @@ public class TagAssignmentDAO {
 				// String q2 = "update inventory_master set agent = '" + idValue
 				// + "' where tid = ?";
 
-				conn.setAutoCommit(false);
 				if (userId.equalsIgnoreCase("admin") || userId.startsWith("ST")) {
 					log.info("QUERY1 :: " + sql);
 					ps1 = conn.prepareStatement(sql);
@@ -85,10 +81,8 @@ public class TagAssignmentDAO {
 					ps2.executeBatch();
 
 					log.info("TagAssignmentDAO.java :: inside the admin and ST.........");
-				}
+				} else { // branch
 
-				else // branch
-				{
 					log.info("Branch : " + userId + " ,  Tag allocated to agent id : " + idValue + "  , No of Tag :: "
 							+ count);
 					log.info("QUERY3 :: " + q1);
@@ -103,8 +97,7 @@ public class TagAssignmentDAO {
 					log.info("QUERY4 :: " + q2);
 					ps4 = conn.prepareStatement(q2);
 					while (rs1 != null && rs1.next()) {
-						// log.info("Update ::: "+sql1+" for TID =
-						// "+rs.getString("tid"));
+
 						ps4.setString(1, rs1.getString("tid"));
 						ps4.addBatch();
 					}
@@ -112,27 +105,17 @@ public class TagAssignmentDAO {
 
 					log.info("TagAssignmentDAO.java :: inside Branch and agent .........");
 				}
-				conn.commit();
+
 				status = "1";
 
-			}
-
-			else {
+			} else {
 				status = "2";
 			}
 
 		} catch (Exception e) {
-			try {
-				conn.rollback();
-			} catch (SQLException e1) {
-				log.error("TagAssignmentDAO.java Getting Error   :::    ", e1);
-			}
-			log.error("Something went wrong while assgning tags...", e);
-			// status = "-2";
+			log.error("TagAssignmentDAO.java Getting Error   :::    " + e);
 			status = e.getMessage();
-		}
-
-		finally {
+		} finally {
 			DatabaseManager.closeResultSet(rs2);
 			DatabaseManager.closeResultSet(rs1);
 			DatabaseManager.closePreparedStatement(ps);
@@ -140,8 +123,6 @@ public class TagAssignmentDAO {
 			DatabaseManager.closePreparedStatement(ps3);
 			DatabaseManager.closePreparedStatement(ps2);
 			DatabaseManager.closePreparedStatement(ps1);
-			DatabaseManager.closeConnection(conn);
-
 		}
 		return status;
 	}

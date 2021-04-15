@@ -48,70 +48,50 @@ public class AgentCheckerManagement extends HttpServlet {
 
 			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"),
 					request.getHeader("Authorization"), conn);
-			
+
 			if (!checkSession) {
 				response.setStatus(403);
 				return;
 			}
-			
+
 			String ipAddress = request.getRemoteAddr();
-			//responseDTO = SessionValidation.validateSession(request.getHeader("userId"),
-			//		request.getHeader("Authorization"), conn);
-
+			
 			AgentService agentService = new AgentService();
-			//if (responseDTO.getStatus().equals(ResponseDTO.success)) {
+			stringBuffer = RequestReaderUtility.getStringBufferRequest(request);
+			jsonRequest = new JSONObject(stringBuffer.toString());
+			log.info("jsonRequest " + jsonRequest);
+			AgentDTO agentDTO = new AgentDTO();
+			String requestType = jsonRequest.getString("requestType");
+			log.info("UserManagement requestType " + requestType);
 
-				stringBuffer = RequestReaderUtility.getStringBufferRequest(request);
-				jsonRequest = new JSONObject(stringBuffer.toString());
-				log.info("jsonRequest " + jsonRequest);
-				// AgentDTO agentDTO = new Gson().fromJson(jsonRequest.toString(),
-				// AgentDTO.class);
-				AgentDTO agentDTO = new AgentDTO();
-				String requestType = jsonRequest.getString("requestType");
-				log.info("UserManagement requestType " + requestType);
+			if (("updateAgent").equalsIgnoreCase(requestType)) {
+				JSONObject agentInfo = jsonRequest.getJSONObject("agentInfo");
+				JSONObject address = jsonRequest.getJSONObject("address");
+				JSONObject account = jsonRequest.getJSONObject("account");
+				AddressDTO addressDTO = new Gson().fromJson(address.toString(), AddressDTO.class);
+				AccountDTO accountDTO = new Gson().fromJson(account.toString(), AccountDTO.class);
+				agentDTO = new Gson().fromJson(agentInfo.toString(), AgentDTO.class);
+				agentDTO.setAgentId(jsonRequest.getString("agentId"));
+				responseDTO = agentService.updateAgent(agentDTO, addressDTO, accountDTO, request.getHeader("userId"),
+						conn);
+			}
 
-				if (("updateAgent").equalsIgnoreCase(requestType)) {
-					JSONObject agentInfo = jsonRequest.getJSONObject("agentInfo");
-					JSONObject address = jsonRequest.getJSONObject("address");
-					JSONObject account = jsonRequest.getJSONObject("account");
-					AddressDTO addressDTO = new Gson().fromJson(address.toString(), AddressDTO.class);
-					AccountDTO accountDTO = new Gson().fromJson(account.toString(), AccountDTO.class);
-					agentDTO = new Gson().fromJson(agentInfo.toString(), AgentDTO.class);
-					agentDTO.setAgentId(jsonRequest.getString("agentId"));
-					responseDTO = agentService.updateAgent(agentDTO, addressDTO, accountDTO,
-							request.getHeader("userId"), conn);
-					// finalResponse = gson.toJson(responseDTO);
-				}
-
-				else if (("approveAgent").equalsIgnoreCase(requestType)) {
-					log.info("Request Step 1");
-					agentDTO = new Gson().fromJson(jsonRequest.toString(), AgentDTO.class);
-					responseDTO = agentService.approveAgent(agentDTO, request.getHeader("userId"), conn);
-					// finalResponse = gson.toJson(responseDTO);
-				} else if (("rejectAgent").equalsIgnoreCase(requestType)) {
-					agentDTO = new Gson().fromJson(jsonRequest.toString(), AgentDTO.class);
-					responseDTO = agentService.rejectAgent(agentDTO, request.getHeader("userId"), conn);
-					// finalResponse = gson.toJson(responseDTO);
-				} else if (("deleteAgent").equalsIgnoreCase(requestType)) {
-					agentDTO = new Gson().fromJson(jsonRequest.toString(), AgentDTO.class);
-					responseDTO = agentService.deleteAgent(agentDTO, request.getHeader("userId"), conn);
-					// finalResponse = gson.toJson(responseDTO);
-				} else if (("getAgentById").equalsIgnoreCase(requestType)) {
-					agentDTO = new Gson().fromJson(jsonRequest.toString(), AgentDTO.class);
-					responseDTO = agentService.getAgentById(agentDTO.getAgentId(), request.getHeader("userId"), conn);
-					// finalResponse = gson.toJson(responseDTO);
-				} else if (("getAgentList").equalsIgnoreCase(requestType)) {
-					responseDTO = agentService.getAgentList(request.getHeader("userId"), conn);
-					// finalResponse = gson.toJson(responseDTO);
-				}
-
-			/*
-			 * } else { log.info("Invalid Request Type"); // ResponseDTO resp = new
-			 * ResponseDTO(); responseDTO.setErrorCode(AgentErrorCode.WINNABU0029.name());
-			 * responseDTO.setMessage(AgentErrorCode.WINNABU0029.getErrorMessage());
-			 * responseDTO.setStatus(ResponseDTO.failure); // finalResponse =
-			 * gson.toJson(responseDTO); }
-			 */
+			else if (("approveAgent").equalsIgnoreCase(requestType)) {
+				log.info("Request Step 1");
+				agentDTO = new Gson().fromJson(jsonRequest.toString(), AgentDTO.class);
+				responseDTO = agentService.approveAgent(agentDTO, request.getHeader("userId"), conn);
+			} else if (("rejectAgent").equalsIgnoreCase(requestType)) {
+				agentDTO = new Gson().fromJson(jsonRequest.toString(), AgentDTO.class);
+				responseDTO = agentService.rejectAgent(agentDTO, request.getHeader("userId"), conn);
+			} else if (("deleteAgent").equalsIgnoreCase(requestType)) {
+				agentDTO = new Gson().fromJson(jsonRequest.toString(), AgentDTO.class);
+				responseDTO = agentService.deleteAgent(agentDTO, request.getHeader("userId"), conn);
+			} else if (("getAgentById").equalsIgnoreCase(requestType)) {
+				agentDTO = new Gson().fromJson(jsonRequest.toString(), AgentDTO.class);
+				responseDTO = agentService.getAgentById(agentDTO.getAgentId(), request.getHeader("userId"), conn);
+			} else if (("getAgentList").equalsIgnoreCase(requestType)) {
+				responseDTO = agentService.getAgentList(request.getHeader("userId"), conn);
+			}
 
 			finalResponse = gson.toJson(responseDTO);
 			log.info("*****************Response to /agent/manageagent API()****************");

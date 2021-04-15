@@ -52,8 +52,6 @@ public class AddCustomer extends HttpServlet {
 			}
 
 			finalResponse = gson.toJson(responseDTO);
-			// responseDTO.setStatus("1");
-			// if (responseDTO.getStatus().equals(ResponseDTO.success)) {
 			stringBuffer = RequestReaderUtility.getStringBufferRequest(request);
 			jsonRequest = new JSONObject(stringBuffer.toString());
 			log.info("REQUEST :: " + jsonRequest);
@@ -61,16 +59,15 @@ public class AddCustomer extends HttpServlet {
 			JSONObject address = jsonRequest.getJSONObject("address");
 			JSONObject account = jsonRequest.getJSONObject("account");
 			JSONObject kyc = jsonRequest.getJSONObject("kyc");
-			// JSONArray vehicles = jsonRequest.getJSONArray("vehicles");
+
 			CustomerDTO customerDTO = new Gson().fromJson(customer.toString(), CustomerDTO.class);
 			AddressDTO addressDTO = new Gson().fromJson(address.toString(), AddressDTO.class);
 			AccountDTO accountDTO = new Gson().fromJson(account.toString(), AccountDTO.class);
 			KycDTO kycDTO = new Gson().fromJson(kyc.toString(), KycDTO.class);
 			VehicleDTO vehicleDTO = new Gson().fromJson(stringBuffer.toString(), VehicleDTO.class);
 			responseDTO = CustomerService.addCustomer(conn, customerDTO, addressDTO, accountDTO, kycDTO, vehicleDTO,
-					request.getHeader("userId"));// );
+					request.getHeader("userId"));
 			finalResponse = gson.toJson(responseDTO);
-			// }
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.info(e.getMessage());
