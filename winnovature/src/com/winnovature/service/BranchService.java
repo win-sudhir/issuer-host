@@ -9,7 +9,12 @@ import org.apache.log4j.Logger;
 
 import com.winnovature.contants.IDGenerator;
 import com.winnovature.contants.WINConstants;
+import com.winnovature.dao.AccountDAO;
+import com.winnovature.dao.AddressDAO;
 import com.winnovature.dao.BranchDAO;
+import com.winnovature.dto.AccountDTO;
+import com.winnovature.dto.AddressDTO;
+import com.winnovature.dto.AgentDTO;
 import com.winnovature.dto.BranchAccountDTO;
 import com.winnovature.dto.BranchDTO;
 import com.winnovature.dto.ResponseDTO;
@@ -17,6 +22,7 @@ import com.winnovature.utils.AuditTrail;
 import com.winnovature.utils.EmailTemplate;
 import com.winnovature.utils.PasswordManager;
 import com.winnovature.utils.SendMailService;
+import com.winnovature.validation.AgentErrorCode;
 import com.winnovature.validation.BranchErrorCode;
 import com.winnovature.validation.BranchValidation;
 
@@ -214,4 +220,37 @@ public class BranchService {
 	public List<String> getBrancgListForSaleAgent(Connection conn) {
 		return branchDAO.getBrancgListForSaleAgent(conn);
 	}
+
+	public ResponseDTO getBranchById(String branchId, String header, Connection conn) {
+		BranchDTO branch = BranchDAO.getBranchById(branchId, conn);
+		AddressDTO addressDTO=new AddressDAO().getAddressById(conn, branchId);
+		AccountDTO accountDTO=new AccountDAO().getAccountById(conn, branchId);
+		//ResponseDTO responseDTO = new ResponseDTO();
+		responseDTO.setBranch(branch);
+		responseDTO.setAddress(addressDTO);
+		responseDTO.setAccount(accountDTO);
+		responseDTO.setStatus(ResponseDTO.success);
+		return responseDTO;
+	}
+	
+	public ResponseDTO updateBranch(BranchDTO branchDTO, AddressDTO addressDTO, AccountDTO accountDTO, String userId,
+			Connection conn) {
+		String response = BranchDAO.updateBranch(branchDTO, userId, conn);
+		if(response.equals("0")){
+			responseDTO.setStatus(ResponseDTO.failure);
+			responseDTO.setMessage("Branch can not update, please try later.");
+			responseDTO.setErrorCode("WINBUBU009");
+			return responseDTO;
+		}
+		addressDTO.setUserId(branchDTO.getBranchId());
+		accountDTO.setUserId(branchDTO.getBranchId());
+		AddressDAO.updateAddress(conn, addressDTO, userId);
+		AccountDAO.updateAccount(conn, accountDTO, userId);
+		responseDTO.setStatus(ResponseDTO.success);
+		responseDTO.setMessage("Branch updated successfully.");
+		responseDTO.setErrorCode("WINBUBU010");
+		return responseDTO;
+	}
+	
+	
 }

@@ -25,6 +25,7 @@ public class ResponseDTO implements Serializable {
 	private UserDTO user;
 	private AgentDTO agent;
 	private PurchaseOrderDTO purchaseOrder;
+	private BranchDTO branch;
 
 	private List<ReconSummaryDTO> reconSummary;
 	private List<ReconDates> dateList;
@@ -224,6 +225,14 @@ public class ResponseDTO implements Serializable {
 
 	public void setPurchaseOrder(PurchaseOrderDTO purchaseOrder) {
 		this.purchaseOrder = purchaseOrder;
+	}
+
+	public BranchDTO getBranch() {
+		return branch;
+	}
+
+	public void setBranch(BranchDTO branch) {
+		this.branch = branch;
 	}
 
 }

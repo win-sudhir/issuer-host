@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.winnovature.contants.WINConstants;
+import com.winnovature.dto.AgentDTO;
 import com.winnovature.dto.BranchAccountDTO;
 import com.winnovature.dto.BranchDTO;
 import com.winnovature.utils.DatabaseManager;
@@ -388,6 +389,69 @@ public class BranchDAO {
 			DatabaseManager.closePreparedStatement(ps);
 		}
 		return branchLst;
+	}
+
+	public static BranchDTO getBranchById(String branchId, Connection conn) {
+		ResultSet rs = null;
+		PreparedStatement ps = null;
+		BranchDTO branchDTO = new BranchDTO();
+		try {
+			String query = "SELECT * FROM branch_info WHERE branch_id=?";
+			ps = conn.prepareStatement(query);
+			ps.setString(1, branchId);
+			rs = ps.executeQuery();
+			//branch_id, bank_branch_id, branch_name, email_id, contact_number, is_active, status, created_by, created_on, approved_by, approved_on, is_approved, is_deleted, rodt, isModifiedby, act_deact_status, act_date, dact_date, last_updated_by, delete_status, action_status
+			if (rs.next()) {
+				
+				branchDTO.setBranchId(rs.getString("branch_id"));
+				branchDTO.setBankBranchId(rs.getString("bank_branch_id"));
+				branchDTO.setBranchName(rs.getString("branch_name"));
+				branchDTO.setEmailId(rs.getString("email_id"));
+				branchDTO.setContactNumber(rs.getString("contact_number"));
+				
+			}
+			return branchDTO;
+		}
+
+		catch (Exception e) {
+			log.error("getBranchById()  ::  getting error  : ", e);
+			e.printStackTrace();
+		} finally {
+			DatabaseManager.closeResultSet(rs);
+			DatabaseManager.closePreparedStatement(ps);
+		}
+		return branchDTO;
+	}
+
+	public static String updateBranch(BranchDTO branchDTO, String userId, Connection conn) {
+		String currentDate = new DateUtils().getCurrnetDate();
+		PreparedStatement ps = null;
+		//branch_id, bank_branch_id, branch_name, email_id, contact_number, is_active, status, created_by, created_on, approved_by, approved_on, is_approved, is_deleted, rodt, isModifiedby, act_deact_status, act_date, dact_date, last_updated_by, delete_status, action_status
+		String sql = "UPDATE branch_info SET bank_branch_id=?, branch_name=?, email_id=?, contact_number=?, last_updated_by=?, act_date= ? WHERE branch_id = ?";
+		try {
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, branchDTO.getBankBranchId());
+			ps.setString(2, branchDTO.getBranchName());
+			ps.setString(3, branchDTO.getEmailId());
+			ps.setString(4, branchDTO.getContactNumber());
+			ps.setString(5, userId);
+			ps.setString(6, currentDate);
+			ps.setString(7, branchDTO.getBranchId());
+			
+			if (ps.executeUpdate() > 0) {
+				log.info("branch updated successfully.");
+				return "1";
+			} else {
+				return "0";
+			}
+
+		} catch (Exception e) {
+			log.info(("Exception in updateAgent() :: " + e.getMessage()));
+			e.printStackTrace();
+		} finally {
+			DatabaseManager.closePreparedStatement(ps);
+		}
+		return "0";
 	}
 
 }
