@@ -1,7 +1,6 @@
 package com.winnovature.service;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -11,23 +10,24 @@ import java.sql.Connection;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
+import com.winnovature.constants.WINConstants;
+import com.winnovature.dao.CustomerDAO;
 import com.winnovature.dao.UnRegisterTagDAO;
+import com.winnovature.dto.CustomerDTO;
 import com.winnovature.dto.ResponseDTO;
 import com.winnovature.dto.TagAllocationDTO;
 import com.winnovature.dto.TransactionDTO;
-import com.winnovature.dto.WalletResponse;
-import com.winnovature.validation.TransactionErrorCode;
 
 public class UnRegisterTagService {
 	static Logger log = Logger.getLogger(UnRegisterTagService.class.getName());
 	
-	public static TagAllocationDTO isUnRegisterTag(String tid, String vehicleNumber, Connection conn) {
-		TagAllocationDTO tagAllocationDTO = UnRegisterTagDAO.isUnRegisterTag(tid, vehicleNumber, conn);
-		return tagAllocationDTO;
+	public static TagAllocationDTO isUnRegisterTag(TagAllocationDTO tagAllocationDTO, Connection conn) {
+		return UnRegisterTagDAO.isUnRegisterTag(tagAllocationDTO.getTID(), tagAllocationDTO.getVehicleNumber(), conn);
+		//return tagAllocationDTO;
 	}
 
 	public static String removeFromBlackList(String tagId, String userId, String authToken, Connection conn) {
-		String url ="http://localhost:8080/winnovature/tag/excemanagement";
+		String url =WINConstants.localBLURL;
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("opid","REMOVE");
 		jsonObject.put("tagId",tagId);		
@@ -53,96 +53,33 @@ public class UnRegisterTagService {
 	}
 
 	public static String unRegisterTagTransaction(TagAllocationDTO tagAllocationDTO, String userId, String authToken, Connection conn) {
-		log.info("---UNREG TRANSACTION START---");
-		TransactionDTO transactionDTO = new TransactionDTO();	
+		log.info("---UNREG TRANSACTION START---"+tagAllocationDTO.getVehicleNumber());
+		CustomerDTO customerDTO = new CustomerDAO().geCustomersWalletByVehicleNumber(conn, tagAllocationDTO.getVehicleNumber());
+		TransactionDTO transactionDTO = new TransactionDTO();
+		transactionDTO.setWalletId(customerDTO.getWalletId());
+		log.info("--- UNREG WALLETID ---"+customerDTO.getWalletId());
+		log.info("--- UNREG TXN AMOUNT ---"+tagAllocationDTO.getUnRegTxnAmount());
 		transactionDTO.setSourceChannel(TransactionDTO.SOURCECHANNEL);
-			transactionDTO.setSourceChannelIP(TransactionDTO.SOURCECHANNELIP);
-			transactionDTO = TransactionService.getCustomerInfoByVehicle(transactionDTO, conn);
-			transactionDTO.setTxnAmount(tagAllocationDTO.getUnRegTxnAmount());
-			transactionDTO.setRemarks("Unregister tag transaction.");
-			transactionDTO.setPayMode("UNREGTAG");
-			ResponseDTO responseDTO = UnRegisterTagDAO.unRegisterTagTransaction(transactionDTO, userId, conn);
-			if(responseDTO.getStatus().equals(ResponseDTO.failure)){
-				responseDTO.setStatus(ResponseDTO.failure);
-				responseDTO.setMessage(TransactionErrorCode.WINTXNBU002.getErrorMessage());
-				responseDTO.setErrorCode(TransactionErrorCode.WINTXNBU002.name());
-				return responseDTO.getStatus();//failure
-			}
-			UnRegisterTagDAO.updateUnRegisterTagStatus(tagAllocationDTO, conn);
-			responseDTO.setErrorCode(TransactionErrorCode.WINTXNBU000.name());
-			return "1";//success
+		transactionDTO.setSourceChannelIP(TransactionDTO.SOURCECHANNELIP);
+		transactionDTO.setTxnType("DEBIT");
+		//transactionDTO = TransactionService.getCustomerInfoByVehicle(transactionDTO, conn);
+		transactionDTO.setTxnAmount(tagAllocationDTO.getUnRegTxnAmount());
+		transactionDTO.setSecurityDeposit("0");
+		transactionDTO.setRemarks("Unregister tag transaction.");
+		transactionDTO.setPayMode("UNREGTAG");
+		ResponseDTO responseDTO = UnRegisterTagDAO.unRegisterTagTransaction(transactionDTO, userId, conn);
+		if(responseDTO.getStatus().equals(ResponseDTO.failure)){
+			responseDTO.setStatus(ResponseDTO.failure);
+			//responseDTO.setMessage(TransactionErrorCode.WINTXNBU002.getErrorMessage());
+			//responseDTO.setErrorCode(TransactionErrorCode.WINTXNBU002.name());
+			return responseDTO.getStatus();//failure
+		}
+		UnRegisterTagDAO.updateUnRegisterTagStatus(tagAllocationDTO, conn);
+		//responseDTO.setErrorCode(TransactionErrorCode.WINTXNBU000.name());
+		//responseDTO.setStatus("1");
+		return "1";//success
 	}
 	
-	private static WalletResponse removeBlackListTagTest(String data,String userId, String authToken, String sURL) throws Exception
-	{
-		// TODO Auto-generated method stub	
-		log.info("removeBlackListTag.java ::: Posting URL : " + sURL);
-		
-		WalletResponse walletResponse = new WalletResponse();
-		URL obj = new URL(sURL);
-		
-		
-		//Use for HTTP Connection
- 		
-		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
-		//add request header
-	
-		con.setRequestMethod("POST");
-		con.addRequestProperty("Content-Type", "text/plain;charset=UTF-8");
-		con.setDoOutput(true);
-		con.setRequestProperty("Authorization",authToken);
-		con.setRequestProperty("userId",userId);
-		
-		con.connect();
-		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-		wr.writeBytes(data);
-		wr.flush();
-		wr.close();
-
-		// set response code
-		int responseCode = con.getResponseCode();
-		walletResponse.setHttpCode(responseCode);
-		
-		StringBuffer response = new StringBuffer();
-		
-		
-		log.info("removeBlackListTag() ::: Response Code : " + responseCode);
-		BufferedReader in = null;
-		String inputLine = null;
-		if(responseCode==200)
-		{
-			log.info("removeBlackListTag ::: responseCode : "+responseCode);
-			in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		}
-		else if(responseCode==202)
-		{
-			log.info("Server2ServerCall.java :::  removeBlackListTag :: responseCode : "+responseCode);
-			in = null;
-			response.append("NO DATA");
-		}
-		else
-		{
-			in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-		}
-		
-		if(in != null)
-		{
-			while ((inputLine = in.readLine()) != null)
-			{
-				response.append(inputLine);
-			}
-			
-			in.close();
-			
-			//print result
-			
-			log.info("Server2ServerCall.java ::: removeBlackListTag() :: Response Received From switch call :: "+response.toString());
-			walletResponse.setResponse(response.toString());
-		}
-
-		return walletResponse;
-	}
 	
 	public static String removeBlackListTag(String reqData, String userId, String authToken, String URL) {
 		try {

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.winnovature.contants.IDGenerator;
+import com.winnovature.constants.IDGenerator;
 import com.winnovature.dao.AccountDAO;
 import com.winnovature.dao.AddressDAO;
 import com.winnovature.dao.AgentMakerDAO;

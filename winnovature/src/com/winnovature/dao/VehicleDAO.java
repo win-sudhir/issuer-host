@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.winnovature.contants.WINConstants;
+import com.winnovature.constants.WINConstants;
 import com.winnovature.dto.VehicleDTO;
 import com.winnovature.dto.VehicleDTO.Vehicles;
 import com.winnovature.utils.DatabaseManager;

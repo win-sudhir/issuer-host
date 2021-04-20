@@ -44,7 +44,7 @@ public class TransactionService {
 		return responseDTO;
 	}*/
 
-	
+	/*
 	public static ResponseDTO approveCustomer(Connection conn, String customerId, String userId) {
 		ResponseDTO responseDTO = new ResponseDTO();
 		new CustomerDAO().approveCustomer(conn, userId, customerId);
@@ -53,7 +53,7 @@ public class TransactionService {
 		responseDTO.setErrorCode("WINCUBU0004");
 		return responseDTO;
 	}
-	
+	*/
 	public static CustomerDTO getCustomerWalletInfo(Connection conn, String customerId) {
 		CustomerDTO customerDTO = new CustomerDAO().geCustomersWalletInfo(conn, customerId);
 		return customerDTO;
@@ -98,7 +98,7 @@ public class TransactionService {
 		return responseDTO;
 	}
 
-	private static TransactionDTO getCustomerInfoByVehicle(TransactionDTO transactionDTO, Connection conn) {
+	static TransactionDTO getCustomerInfoByVehicle(TransactionDTO transactionDTO, Connection conn) {
 		String vehicleNumber = transactionDTO.getUserId(); 
 		CustomerDTO customerDTO = new CustomerDAO().geCustomersWalletByVehicleNumber(conn, vehicleNumber);
 		transactionDTO.setWalletId(customerDTO.getWalletId());

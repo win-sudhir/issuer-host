@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.winnovature.contants.IDGenerator;
-import com.winnovature.contants.WINConstants;
+import com.winnovature.constants.IDGenerator;
+import com.winnovature.constants.WINConstants;
 import com.winnovature.dao.AddressDAO;
 import com.winnovature.dao.CustomerDAO;
 import com.winnovature.dao.UserDAO;

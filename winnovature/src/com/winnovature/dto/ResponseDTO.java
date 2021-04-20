@@ -26,6 +26,7 @@ public class ResponseDTO implements Serializable {
 	private AgentDTO agent;
 	private PurchaseOrderDTO purchaseOrder;
 	private BranchDTO branch;
+	private ChallanDTO challan;
 
 	private List<ReconSummaryDTO> reconSummary;
 	private List<ReconDates> dateList;
@@ -233,6 +234,14 @@ public class ResponseDTO implements Serializable {
 
 	public void setBranch(BranchDTO branch) {
 		this.branch = branch;
+	}
+
+	public ChallanDTO getChallan() {
+		return challan;
+	}
+
+	public void setChallan(ChallanDTO challan) {
+		this.challan = challan;
 	}
 
 }

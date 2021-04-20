@@ -14,7 +14,7 @@ public class TagAllocationDTO implements Serializable {
 	private String txnId;
 	private String TID;
 	private String vehicleNumber;
-	private String thresholdNo;
+	private String minThreshold;
 	
 	private String amtIssuence;
 	private String amtRecharge;
@@ -61,11 +61,12 @@ public class TagAllocationDTO implements Serializable {
 	public void setVehicleNumber(String vehicleNumber) {
 		this.vehicleNumber = vehicleNumber;
 	}
-	public String getThresholdNo() {
-		return thresholdNo;
+	
+	public String getMinThreshold() {
+		return minThreshold;
 	}
-	public void setThresholdNo(String thresholdNo) {
-		this.thresholdNo = thresholdNo;
+	public void setMinThreshold(String minThreshold) {
+		this.minThreshold = minThreshold;
 	}
 	public String getAmtIssuence() {
 		return amtIssuence;

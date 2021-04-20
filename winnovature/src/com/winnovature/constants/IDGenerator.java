@@ -1,4 +1,4 @@
-package com.winnovature.contants;
+package com.winnovature.constants;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

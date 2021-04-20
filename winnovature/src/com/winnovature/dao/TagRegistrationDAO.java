@@ -3,14 +3,12 @@ package com.winnovature.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
+import com.winnovature.dto.ChallanDTO;
+import com.winnovature.dto.TagAllocationDTO;
 import com.winnovature.utils.DatabaseManager;
 
 public class TagRegistrationDAO {
@@ -87,7 +85,7 @@ public class TagRegistrationDAO {
 	 * return null; }
 	 */
 
-	public boolean isAllocated(String TID, String VehicleNumber, String min_threshold, Connection conn)// adding
+	public static boolean isAllocated(String TID, String VehicleNumber, String min_threshold, Connection conn)// adding
 	// threshold
 	{
 		log.info("In Allocate tag dao isAllocated...................");
@@ -131,6 +129,7 @@ public class TagRegistrationDAO {
 	}
 
 	// now user in TagAllocation UAT :::
+	/*
 	public boolean allocateTagGenerateChallan(String TID, String VehicleNumber, String min_threshold, String txnID,
 			String seqNO, String amtIssuence, String amtRecharge, String amtRSA, String amtSecurity,
 			String amtInsurance)// adding threshold
@@ -268,7 +267,7 @@ public class TagRegistrationDAO {
 			 * tbl_min_threshold); if (rs3.getString("min_threshold") != null)
 			 * tbl_min_threshold = rs3.getString("min_threshold"); else tbl_min_threshold =
 			 * "0"; log.info("Last Min Threshold : " + tbl_min_threshold); break; }
-			 */
+			 s
 			// tbl_min_threshold = "0";
 //			int threshold = Integer.valueOf(tbl_min_threshold) + Integer.valueOf(min_threshold);
 //			min_threshold = Integer.toString(threshold);// Integer.toString(Integer.valueOf(tbl_min_threshold)
@@ -302,6 +301,7 @@ public class TagRegistrationDAO {
 
 		return check;
 	}
+	*/
 
 	public static void addCharges(String tag_id, String vehicle_number, String cust_id, String amtIssuence,
 			String amtRecharge, String amtRSA, String amtSecurity, String amtInsurance) {
@@ -384,6 +384,42 @@ public class TagRegistrationDAO {
 		}
 		return insidechallan;
 	}
+	
+	public static ChallanDTO getChallanData(TagAllocationDTO tagAllocationDTO, Connection conn)// adding
+	{
+		ChallanDTO challan = new ChallanDTO();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+
+			String sql = "select * from challan_master where tid=? and vehicle_number= ?";
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, tagAllocationDTO.getTID());
+			ps.setString(2, tagAllocationDTO.getVehicleNumber());
+			rs = ps.executeQuery();
+			log.info("getChallanData() sql :::: " + sql);
+			if (rs.next()) {
+				challan.setBankName(rs.getString("bank_name"));
+				challan.setChallanId(rs.getString("challan_id"));
+				challan.setChassisNumber(rs.getString("chassis_number"));
+				challan.setCreatedDate(rs.getString("created_date"));
+				challan.setEngineNumber(rs.getString("engine_number"));
+				challan.setTid(rs.getString("tid"));
+				challan.setTagId(rs.getString("tag_id"));
+				challan.setVehicleNumber(rs.getString("vehicle_number"));
+				return challan;
+			}
+
+			updateTagStatus(tagAllocationDTO.getTID(), conn);
+		} catch (Exception e) {
+			log.error("Getting Error   :::    ", e);
+		} finally {
+			DatabaseManager.closeResultSet(rs);
+			DatabaseManager.closePreparedStatement(ps);
+		}
+		return challan;
+	}
 
 	public static void updateTagStatus(String TID, Connection conn) {
 
@@ -391,8 +427,8 @@ public class TagRegistrationDAO {
 		String sqlupdate = "update vehicle_tag_linking_history set tag_status = ? where tid= ? ";
 		try {
 			ps = conn.prepareStatement(sqlupdate);
-			ps.setString(1, TID);
-			ps.setString(2, "2");
+			ps.setString(1, "1");
+			ps.setString(2, TID);
 			ps.executeUpdate();
 			log.info("Status changed Successfully.........");
 		} catch (Exception e) {

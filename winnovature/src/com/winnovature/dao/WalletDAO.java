@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 
 import org.apache.log4j.Logger;
 
-import com.winnovature.contants.WINConstants;
+import com.winnovature.constants.WINConstants;
 import com.winnovature.dto.WalletDTO;
 import com.winnovature.utils.DatabaseManager;
 import com.winnovature.utils.DateUtils;

@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 
 import org.apache.log4j.Logger;
 
-import com.winnovature.contants.WINConstants;
+import com.winnovature.constants.WINConstants;
 import com.winnovature.dto.VirtualAccountDTO;
 import com.winnovature.utils.DatabaseManager;
 import com.winnovature.utils.DateUtils;

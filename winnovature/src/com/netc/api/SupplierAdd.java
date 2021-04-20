@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
-import com.winnovature.contants.IDGenerator;
+import com.winnovature.constants.IDGenerator;
 import com.winnovature.dao.CheckSession;
 import com.winnovature.dao.DAOManager;
 import com.winnovature.utils.AuditTrail;

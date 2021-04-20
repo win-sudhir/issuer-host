@@ -37,6 +37,8 @@ public class UnRegisterTagDAO {
 				tagAllocationDTO.setUnRegTxnAmount(rs.getString("amount"));
 				tagAllocationDTO.setTID(tid);
 				tagAllocationDTO.setVehicleNumber(vehicleNumber);
+				tagAllocationDTO.setAmtIssuence(tagAllocationDTO.getAmtIssuence());
+				tagAllocationDTO.setAmtSecurity(tagAllocationDTO.getAmtSecurity());
 				return tagAllocationDTO;
 			}
 
@@ -51,7 +53,8 @@ public class UnRegisterTagDAO {
 	}
 
 	public static ResponseDTO unRegisterTagTransaction(TransactionDTO transactionDTO, String userId, Connection conn) {
-		log.info("unRegisterTagTransaction => pr_unregtxn.....");
+		log.info("unRegisterTagTransaction => pr_unregtxn....."+transactionDTO.getWalletId());
+		log.info("unRegisterTagTransaction => pr_unregtxn....."+transactionDTO.getTxnAmount());
 		ResponseDTO responseDTO = new ResponseDTO();
 		CallableStatement cs = null;
 		try {

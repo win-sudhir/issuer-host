@@ -1,4 +1,4 @@
-package com.winnovature.contants;
+package com.winnovature.constants;
 
 public class WINConstants {
 	//checker status
@@ -41,4 +41,5 @@ public class WINConstants {
 	public static String CUSTOMERROLEID = "2";
 	public static String AGENTROLEID = "7";
 	public static String BRANCHROLEID = "6";
+	public static String localBLURL = "http://localhost:8080/winnovature/tag/excemanagement";
 }

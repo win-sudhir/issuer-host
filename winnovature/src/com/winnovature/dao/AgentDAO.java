@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import com.winnovature.contants.WINConstants;
+import com.winnovature.constants.WINConstants;
 import com.winnovature.dto.AgentDTO;
 import com.winnovature.utils.DatabaseManager;
 import com.winnovature.utils.DateUtils;

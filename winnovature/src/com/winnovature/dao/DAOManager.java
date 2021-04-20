@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.winnovature.contants.WINConstants;
+import com.winnovature.constants.WINConstants;
 import com.winnovature.utils.DatabaseManager;
 
 public class DAOManager {

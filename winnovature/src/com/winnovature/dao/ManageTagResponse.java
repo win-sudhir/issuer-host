@@ -197,6 +197,7 @@ public class ManageTagResponse {
 			// URL url = new URL("http://10.45.16.11:8082/TestServlet");
 			log.info("<<<<< ManageTagResponse.java >>>>>  :: "
 					+ new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()));
+			//"http://15.207.10.144:8080/switch/TestServlet";
 			String mngTagURL = PropertyReader.getPropertyValue("manageTagURL");
 			log.info("<<<<< ManageTagResponse.java >>>>>"
 					+ new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date()));

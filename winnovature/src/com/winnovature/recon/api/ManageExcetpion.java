@@ -67,7 +67,7 @@ public class ManageExcetpion extends HttpServlet
 
 				//Add tag in NPCI MAPPER's Exception List
 				// respJSON = new ExceptionDetailDaoImpl().manageTagException(tagId, "", "", excCode, insertionFlag, opid);
-				
+				//"http://15.207.10.144:8080/switch/TestServlet";
 				String issuerSwitchUrl = PropertyReader.getPropertyValue("issuerSwitchUrl");
 				String reqParams = "opid="+opid+"&tagId="+tagId+"&seqNum=1"+"&excCode="+excCode+"&ttype=ReqMngMultipleExceptions";
 
