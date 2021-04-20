@@ -32,7 +32,7 @@ public class UnRegisterTagService {
 		jsonObject.put("opid","REMOVE");
 		jsonObject.put("tagId",tagId);		
 		jsonObject.put("excCode","01");
-		jsonObject.put("insertionFlag","M");
+		jsonObject.put("insertionFlag","A");
 		JSONObject jsonResp = null;
 		try {
 			String response = removeBlackListTag(jsonObject.toString(), userId, authToken, url);
