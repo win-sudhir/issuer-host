@@ -18,8 +18,10 @@ import com.winnovature.dao.CheckSession;
 import com.winnovature.dao.ManageTagResponse;
 import com.winnovature.dao.TagAllocationService;
 import com.winnovature.dao.TagRegistrationDAO;
+import com.winnovature.dto.TagAllocationDTO;
 import com.winnovature.dto.TransactionDTO;
 import com.winnovature.service.TransactionService;
+import com.winnovature.service.UnRegisterTagService;
 import com.winnovature.utils.DatabaseManager;
 import com.winnovature.utils.MemoryComponent;
 
@@ -31,23 +33,14 @@ public class TagRegistration extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		JSONObject jresp = new JSONObject();
-		boolean isallocated = false;
-		boolean isgenerated = false;
+		boolean isAllocated = false, isChallanGenerated = false;
 		PrintWriter out = response.getWriter();
-
 		TagRegistrationDAO tagallocationDao = new TagRegistrationDAO();
-
 		StringBuffer sbuffer = new StringBuffer();
-		String line = null;
-
-		String isCommercial = null;
-		String TID, vehicleNumber, min_threshold; // for allocation
-		String amtIssuence, amtRecharge, amtRSA, amtSecurity, amtInsurance;
+		String line = null, isCommercial = null, txnID = null, seqNO = null;
+		String TID, vehicleNumber, minThreshold, amtIssuence, amtRecharge, amtRSA, amtSecurity, amtInsurance;
 		JSONObject challan = new JSONObject();
-
-		String txnID = null, seqNO = null;
-
-		// boolean respStatus = false;
+		
 		String status = "0";
 		String message = null;
 
@@ -74,7 +67,7 @@ public class TagRegistration extends HttpServlet {
 
 			TID = js.getString("TID");
 			vehicleNumber = js.getString("vehicleNumber");
-			min_threshold = "0";// js.getString("ThresholdNo");
+			minThreshold = "0";// js.getString("ThresholdNo");
 			amtIssuence = js.getString("amtIssuence");
 			amtRecharge = "0";// js.getString("amtRecharge");
 			amtRSA = "0";// js.getString("amtRSA");
@@ -83,28 +76,37 @@ public class TagRegistration extends HttpServlet {
 			isCommercial = tagallocationDao.getIsCommercial(vehicleNumber, conn);
 			log.info("TagAllocation.java ::: isCommercial  : " + isCommercial);
 
-			log.info("TID : " + TID + " VehicleNumber : " + vehicleNumber + " Min Threshold : " + min_threshold);
+			log.info("TID : " + TID + " VehicleNumber : " + vehicleNumber + " Min Threshold : " + minThreshold);
 			log.info("amtIssuence : " + amtIssuence + " amtRecharge : " + amtRecharge + " amtRSA : " + amtRSA
 					+ "  amtSecurity : " + amtSecurity + "  amtInsurance  : " + amtInsurance);
 
 			String userId = request.getHeader("userId").toString();
+			String authToken = request.getHeader("Authorization");
 			
+			TagAllocationDTO tagAllocationDTO = UnRegisterTagService.isUnRegisterTag(TID, vehicleNumber, conn);
+			if (tagAllocationDTO.isUnRegister()) {
+				String result = UnRegisterTagService.removeFromBlackList(tagAllocationDTO.getTagId(), userId, authToken, conn);
+				if(result.equalsIgnoreCase("FAILURE")) {
+					log.info("Fail to remove renregistered from blacklist tag.");
+					jresp.put("message", "Fail to remove renregistered from blacklist.");
+					jresp.put("status", "0");
+					return;
+				}
+				UnRegisterTagService.unRegisterTagTransaction(tagAllocationDTO, userId,authToken, conn);
+			}
+
 			if (TagRegistrationDAO.checkBalance(vehicleNumber, amtIssuence, amtSecurity, conn)) {
 				log.info("Balance not sufficient.");
-				message = "In-sufficient balance.";
-				status = "0";
-				jresp.put("message", message);
-				jresp.put("status", status);
+				jresp.put("message", "In-sufficient balance.");
+				jresp.put("status", "0");
 				return;
 			}
 
-			isallocated = tagallocationDao.allocateTag(TID, vehicleNumber, min_threshold, conn);
-			log.info("is allocated value == " + isallocated);
-			if (isallocated) {
-				message = "TID not found in the inventory";
-				status = "0";
-				jresp.put("message", message);
-				jresp.put("status", status);
+			isAllocated = tagallocationDao.isAllocated(TID, vehicleNumber, minThreshold, conn);
+			log.info("is allocated value == " + isAllocated);
+			if (isAllocated) {
+				jresp.put("message", "TID not found in the inventory.");
+				jresp.put("status", "0");
 				return;
 			} else {
 
@@ -122,19 +124,15 @@ public class TagRegistration extends HttpServlet {
 					 */
 					if ((errCode.equals("000") || errCode.equals("240")) && result.equalsIgnoreCase("SUCCESS")) {
 						log.info("Result Success...");
-						///////////////////////////////////////////////////
-						// String tagClassId = null;
-						// tagClassId = new DAOManager().getTagclassID(vehicleNumber);
-						// amtIssuence = tagallocationDao.getTagAllocationCharges(tagClassId);
 
-						isgenerated = new ManageTagResponse().allocateTagInsertChallan(TID, vehicleNumber,
-								min_threshold, txnID, seqNO, amtIssuence, amtRecharge, amtRSA, amtSecurity,
+						isChallanGenerated = new ManageTagResponse().allocateTagInsertChallan(TID, vehicleNumber,
+								minThreshold, txnID, seqNO, amtIssuence, amtRecharge, amtRSA, amtSecurity,
 								amtInsurance, conn);
-						if (isgenerated) {
+						if (isChallanGenerated) {
 							// using normal function
 							status = "1";
 							message = "Tag registered successfully in NPCI.";
-							challan = TagRegistrationDAO.challanData(TID, vehicleNumber, min_threshold, conn);
+							challan = TagRegistrationDAO.challanData(TID, vehicleNumber, minThreshold, conn);
 							log.info("CHALLAN return challanData :: " + challan.toString());
 
 							log.info("TID registered and allocated.................");
@@ -146,7 +144,7 @@ public class TagRegistration extends HttpServlet {
 							transactionDTO.setUserId(vehicleNumber);
 							// Connection conn = DatabaseManager.getConnection();
 							TransactionService.doTagTransaction(conn, transactionDTO, userId);
-							DatabaseManager.closeConnection(conn);
+							//DatabaseManager.closeConnection(conn);
 
 							// tag allocation end-----
 						}
@@ -154,7 +152,7 @@ public class TagRegistration extends HttpServlet {
 						else {
 							message = "CHALLAN is not generated";
 							status = "0";
-							log.info("CHALLAN is not generated :: isgenerated : " + isgenerated);
+							log.info("CHALLAN is not generated :: isgenerated : " + isChallanGenerated);
 						}
 					}
 

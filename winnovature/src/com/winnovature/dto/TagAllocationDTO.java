@@ -10,10 +10,11 @@ public class TagAllocationDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	/*private String Message;
 	private boolean Status;*/
-	
+	private String id;
+	private String txnId;
 	private String TID;
-	private String VehicleNumber;
-	private String ThresholdNo;
+	private String vehicleNumber;
+	private String thresholdNo;
 	
 	private String amtIssuence;
 	private String amtRecharge;
@@ -33,24 +34,38 @@ public class TagAllocationDTO implements Serializable {
 	private String result;  
 	private String sequenceNo;  
 	private String transactionId;
-	
+	private boolean isUnRegister; 
+	private String unRegTxnAmount;
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getTxnId() {
+		return txnId;
+	}
+	public void setTxnId(String txnId) {
+		this.txnId = txnId;
+	}
 	public String getTID() {
 		return TID;
 	}
 	public void setTID(String tID) {
 		TID = tID;
 	}
+	
 	public String getVehicleNumber() {
-		return VehicleNumber;
+		return vehicleNumber;
 	}
 	public void setVehicleNumber(String vehicleNumber) {
-		VehicleNumber = vehicleNumber;
+		this.vehicleNumber = vehicleNumber;
 	}
 	public String getThresholdNo() {
-		return ThresholdNo;
+		return thresholdNo;
 	}
 	public void setThresholdNo(String thresholdNo) {
-		ThresholdNo = thresholdNo;
+		this.thresholdNo = thresholdNo;
 	}
 	public String getAmtIssuence() {
 		return amtIssuence;
@@ -135,6 +150,19 @@ public class TagAllocationDTO implements Serializable {
 	}
 	public void setTransactionId(String transactionId) {
 		this.transactionId = transactionId;
+	}
+	
+	public boolean isUnRegister() {
+		return isUnRegister;
+	}
+	public void setUnRegister(boolean isUnRegister) {
+		this.isUnRegister = isUnRegister;
+	}
+	public String getUnRegTxnAmount() {
+		return unRegTxnAmount;
+	}
+	public void setUnRegTxnAmount(String unRegTxnAmount) {
+		this.unRegTxnAmount = unRegTxnAmount;
 	}
 	
 }

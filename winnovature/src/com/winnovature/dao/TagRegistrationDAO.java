@@ -50,69 +50,57 @@ public class TagRegistrationDAO {
 	 * return tagId; }
 	 */
 
-	public JSONObject getFleetDetails(String tagId) {
-		JSONObject fleetData = new JSONObject();
-		;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		Connection con = null;
-		String query = null;
+	/*
+	 * public JSONObject getFleetDetails(String tagId) { JSONObject fleetData = new
+	 * JSONObject(); ; PreparedStatement ps = null; ResultSet rs = null; Connection
+	 * con = null; String query = null;
+	 * 
+	 * try { con = DatabaseManager.getConnection();
+	 * 
+	 * if (con != null) { if (tagId != null && !tagId.isEmpty() &&
+	 * !tagId.equalsIgnoreCase("NA")) { query =
+	 * "select am.user_id,vl.barcode_data,vl.tid from vehicle_tag_linking vl inner join account_master am on vl.customer_id = am.user_id where vl.tag_id = ?"
+	 * ; ps = con.prepareStatement(query); ps.setString(1, tagId); rs =
+	 * ps.executeQuery(); }
+	 * 
+	 * if (rs != null && rs.next()) { fleetData.put("fleetId",
+	 * rs.getString("user_id")); fleetData.put("barcode",
+	 * rs.getString("barcode_data")); // fleetData.put("tid", rs.getString("tid"));
+	 * // log.info("TID :: "+rs.getString("tid")); System.out.
+	 * println("TagAllocationDao.java ::: getFleetDetails() :: FleetId : '" +
+	 * rs.getString("user_id") + "' And Barcode : '" + rs.getString("barcode_data")
+	 * + "'."); }
+	 * 
+	 * System.out.println("TagAllocationDao.java ::: getFleetDetails() :: Query : '"
+	 * + query + "' And Tag Id : '" + tagId + "'");
+	 * 
+	 * return fleetData; } } catch (Exception e) { System.out.
+	 * println("TagAllocationDao.java ::: getFleetDetails() :: Error Occurred while fetching Tag Id : "
+	 * + e.getMessage()); e.printStackTrace();
+	 * 
+	 * } finally { DatabaseManager.closeResultSet(rs);
+	 * DatabaseManager.closePreparedStatement(ps);
+	 * DatabaseManager.closeConnection(con);
+	 * 
+	 * }
+	 * 
+	 * return null; }
+	 */
 
-		try {
-			con = DatabaseManager.getConnection();
-
-			if (con != null) {
-				if (tagId != null && !tagId.isEmpty() && !tagId.equalsIgnoreCase("NA")) {
-					query = "select am.user_id,vl.barcode_data,vl.tid from vehicle_tag_linking vl inner join account_master am on vl.customer_id = am.user_id where vl.tag_id = ?";
-					ps = con.prepareStatement(query);
-					ps.setString(1, tagId);
-					rs = ps.executeQuery();
-				}
-
-				if (rs != null && rs.next()) {
-					fleetData.put("fleetId", rs.getString("user_id"));
-					fleetData.put("barcode", rs.getString("barcode_data"));
-					// fleetData.put("tid", rs.getString("tid"));
-					// log.info("TID :: "+rs.getString("tid"));
-					System.out.println("TagAllocationDao.java ::: getFleetDetails() :: FleetId : '"
-							+ rs.getString("user_id") + "' And Barcode : '" + rs.getString("barcode_data") + "'.");
-				}
-
-				System.out.println("TagAllocationDao.java ::: getFleetDetails() :: Query : '" + query
-						+ "' And Tag Id : '" + tagId + "'");
-
-				return fleetData;
-			}
-		} catch (Exception e) {
-			System.out.println("TagAllocationDao.java ::: getFleetDetails() :: Error Occurred while fetching Tag Id : "
-					+ e.getMessage());
-			e.printStackTrace();
-
-		} finally {
-			DatabaseManager.closeResultSet(rs);
-			DatabaseManager.closePreparedStatement(ps);
-			DatabaseManager.closeConnection(con);
-
-		}
-
-		return null;
-	}
-
-	public boolean allocateTag(String TID, String VehicleNumber, String min_threshold, Connection conn)// adding
+	public boolean isAllocated(String TID, String VehicleNumber, String min_threshold, Connection conn)// adding
 	// threshold
 	{
+		log.info("In Allocate tag dao isAllocated...................");
 		boolean check = false;
 		ResultSet rs = null;
-		Statement st = null;
-
-		String sql = "SELECT * FROM vehicle_tag_linking where tid='" + TID + "'";
-		// String sql1 = "SELECT * FROM inventory_master";
-		log.info("In Allocate tag dao vehicle_tag_linking...................");
-
+		PreparedStatement ps = null;
+		String sql = "SELECT * FROM vehicle_tag_linking where tid=?";
+		
 		try {
 
-			st = conn.createStatement();
-			rs = st.executeQuery(sql);
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, TID);
+			rs = ps.executeQuery();
 			if (rs.next())// && rs1.next())
 			{
 				if (rs.getString("vehicle_number") != null) {
@@ -137,7 +125,7 @@ public class TagRegistrationDAO {
 			log.error("Getting Exception   :::    ", e);
 		} finally {
 			DatabaseManager.closeResultSet(rs);
-			DatabaseManager.closeStatement(st);
+			DatabaseManager.closePreparedStatement(ps);
 		}
 		return check;
 	}

@@ -170,10 +170,10 @@ public class ManageTagResponse {
 				vehicleClass = callableStatement.getString(4);
 				comVehicle = callableStatement.getString(5);
 
-				if (comVehicle.equals("0"))
-					comVehicle = "F";
-				else
+				if (comVehicle.equals("Y"))
 					comVehicle = "T";
+				else
+					comVehicle = "F";
 
 				log.info("tagId : " + tagId + " vehicleClass : " + vehicleClass + " comVehicle : " + comVehicle);
 			}
