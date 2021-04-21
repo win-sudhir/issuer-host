@@ -74,7 +74,6 @@ public class UnRegisterTagService {
 			//responseDTO.setErrorCode(TransactionErrorCode.WINTXNBU002.name());
 			return responseDTO.getStatus();//failure
 		}
-		UnRegisterTagDAO.updateUnRegisterTagStatus(tagAllocationDTO, conn);
 		//responseDTO.setErrorCode(TransactionErrorCode.WINTXNBU000.name());
 		//responseDTO.setStatus("1");
 		return "1";//success

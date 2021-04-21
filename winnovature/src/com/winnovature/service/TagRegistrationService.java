@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import com.winnovature.dao.ManageTagResponse;
 import com.winnovature.dao.TagAllocationService;
 import com.winnovature.dao.TagRegistrationDAO;
+import com.winnovature.dao.UnRegisterTagDAO;
 import com.winnovature.dto.ChallanDTO;
 import com.winnovature.dto.ResponseDTO;
 import com.winnovature.dto.TagAllocationDTO;
@@ -19,11 +20,45 @@ public class TagRegistrationService {
 	public static ResponseDTO isUnregisterTag(TagAllocationDTO tagAllocationDTO, String userId, String authToken,
 			Connection conn) {
 		ResponseDTO responseDTO = new ResponseDTO();
+
+		tagAllocationDTO = UnRegisterTagService.isUnRegisterTag(tagAllocationDTO, conn);
+		if (!tagAllocationDTO.isUnRegister()) {
+			log.info("TAG IS NOT UNREGISTERED");
+			responseDTO.setStatus("1");
+			return responseDTO;
+		} 
+		log.info("TAG IS UNREGISTERED");
 		TagAllocationDTO tagAllocationDTO1 = new TagAllocationDTO();
 		tagAllocationDTO1.setAmtIssuence(tagAllocationDTO.getAmtIssuence());
 		tagAllocationDTO1.setAmtSecurity(tagAllocationDTO.getAmtSecurity());
 		tagAllocationDTO1.setVehicleNumber(tagAllocationDTO.getVehicleNumber());
 		tagAllocationDTO.setMinThreshold("0");
+		tagAllocationDTO1.setUnRegTxnAmount(tagAllocationDTO.getUnRegTxnAmount());
+		String result = UnRegisterTagService.removeFromBlackList(tagAllocationDTO.getTagId(), userId, authToken,
+				conn);
+		if (result.equalsIgnoreCase("FAILURE")) {
+			log.info("Fail to remove renregistered tag from blacklist tag.");
+			responseDTO.setMessage("Fail to remove renregistered tag from blacklist.");
+			responseDTO.setStatus("0");
+			return responseDTO;
+		}
+		log.info("ISSUEANCE : " + tagAllocationDTO1.getAmtIssuence() + " SECURITY : "
+				+ tagAllocationDTO1.getAmtSecurity());
+		String txnResult = UnRegisterTagService.unRegisterTagTransaction(tagAllocationDTO1, userId, authToken,
+				conn);
+		if (txnResult.equals("0")) {
+			log.info("Failure while unregistered tag transaction.");
+			responseDTO.setMessage("Failure while unregistered tag transaction.");
+			responseDTO.setStatus("0");
+			return responseDTO;
+		}
+		UnRegisterTagDAO.updateUnRegisterTagStatus(tagAllocationDTO, conn);
+		responseDTO.setStatus("1");
+		return responseDTO;
+	}
+
+	public static ResponseDTO isAllocated(TagAllocationDTO tagAllocationDTO, String userId, Connection conn) {
+		ResponseDTO responseDTO = new ResponseDTO();
 		boolean isAllocated = TagRegistrationDAO.isAllocated(tagAllocationDTO.getTID(),
 				tagAllocationDTO.getVehicleNumber(), tagAllocationDTO.getMinThreshold(), conn);
 		log.info("isAllocated value == " + isAllocated);
@@ -32,23 +67,8 @@ public class TagRegistrationService {
 			responseDTO.setStatus("0");
 			return responseDTO;
 		}
-		
-		tagAllocationDTO = UnRegisterTagService.isUnRegisterTag(tagAllocationDTO, conn);
-		tagAllocationDTO1.setUnRegTxnAmount(tagAllocationDTO.getUnRegTxnAmount());
-		if (tagAllocationDTO.isUnRegister()) {
-			String result = UnRegisterTagService.removeFromBlackList(tagAllocationDTO.getTagId(), userId, authToken,
-					conn);
-			if (result.equalsIgnoreCase("FAILURE")) {
-				log.info("Fail to remove renregistered tag from blacklist tag.");
-				responseDTO.setMessage("Fail to remove renregistered tag from blacklist.");
-				responseDTO.setStatus("0");
-				return responseDTO;
-			}
-			UnRegisterTagService.unRegisterTagTransaction(tagAllocationDTO1, userId, authToken, conn);
-		}
-		log.info("ISSUEANCE : "+tagAllocationDTO1.getAmtIssuence()+" SECURITY : "+tagAllocationDTO1.getAmtSecurity());
-		if (TagRegistrationDAO.checkBalance(tagAllocationDTO1.getVehicleNumber(), tagAllocationDTO1.getAmtIssuence(),
-				tagAllocationDTO1.getAmtSecurity(), conn)) {
+		if (TagRegistrationDAO.checkBalance(tagAllocationDTO.getVehicleNumber(), tagAllocationDTO.getAmtIssuence(),
+				tagAllocationDTO.getAmtSecurity(), conn)) {
 			log.info("Balance not sufficient.");
 			responseDTO.setMessage("In-sufficient balance.");
 			responseDTO.setStatus("0");

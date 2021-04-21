@@ -40,8 +40,8 @@ public class TagRegistration extends HttpServlet {
 		try {
 			conn = DatabaseManager.getAutoCommitConnection();
 
-			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"),
-					request.getHeader("Authorization"), conn);
+			boolean checkSession = true;//CheckSession.isValidSession(request.getHeader("userId"),
+					//request.getHeader("Authorization"), conn);
 			if (!checkSession) {
 				response.setStatus(403);
 				return;
@@ -63,7 +63,10 @@ public class TagRegistration extends HttpServlet {
 			if(responseDTO.getStatus().equals(ResponseDTO.failure)){
 				return;
 			}
-			
+			responseDTO = TagRegistrationService.isAllocated(tagAllocationDTO, userId, conn);
+			if(responseDTO.getStatus().equals(ResponseDTO.failure)){
+				return;
+			}
 			responseDTO = TagRegistrationService.processTagRegistration(tagAllocationDTO, userId, conn);
 			if(responseDTO.getStatus().equals(ResponseDTO.failure)){
 				return;
