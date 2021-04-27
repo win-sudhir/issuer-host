@@ -24,9 +24,9 @@ import com.winnovature.utils.MemoryComponent;
 import com.winnovature.utils.PropertyReader;
 
 @WebServlet("/dispute/downloadegcs")
-public class DownloadEGCSFile extends HttpServlet {
+public class DemoDownloadEGCSFile extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	static Logger log = Logger.getLogger(DownloadEGCSFile.class.getName());
+	static Logger log = Logger.getLogger(DemoDownloadEGCSFile.class.getName());
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -35,7 +35,7 @@ public class DownloadEGCSFile extends HttpServlet {
 
 			conn = DatabaseManager.getAutoCommitConnection();
 
-			boolean checkSession = true;//CheckSession.isValidSession(request.getHeader("userId"), request.getHeader("Authorization"), conn);
+			boolean checkSession = CheckSession.isValidSession(request.getHeader("userId"), request.getHeader("Authorization"), conn);
 			if (!checkSession) {
 				response.setStatus(403);
 				return;
@@ -53,7 +53,7 @@ public class DownloadEGCSFile extends HttpServlet {
 				response.setHeader("Content-disposition", "attachment; " + "filename=" + fileName);
 				rows.add("Tag_ID,Function_Code,Txn_Time,Txn_Id,Issuer_ID,Acquirer_ID,Txn_Amount,Reason_Code,Full_Partial_Indicator,Toll_Plaza_Id,TID,MMT,Internal Tracking Number");
 				rows.add("\n");
-				rows.add("34161FA8202F424203ED4388,450,"+getDayMinus1Date()+",'21116182176400,506010,500002,1000,3001,F,100101,E404041334B1D0112265CB77,Customer has not avail the NETC Service,D1617610096113");
+				rows.add("34161FA8202F424203ED4388,450,"+getDayMinus1Date()+",'21116182176400,506010,500002,1000,3001,F,100101,E404041334B1D0112265CB77,Customer has not avail the NETC Service,D2190380230295");
 				log.info("DISPUTE---->Bulk EGCS file downloadCSV()");
 
 			} finally {
