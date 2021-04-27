@@ -44,16 +44,16 @@ public class SingleExceptionPage extends HttpServlet {
 			log.info("REQUEST :: " + jsonRequest);
 			if(jsonRequest.getString("requestType").equalsIgnoreCase("toAdd")) {
 				getDetails = "{\r\n"
-						+ "	\"tagId\":\"34161FA8202F424203ED3048\",\r\n"
-						+ "	\"tid\":\"E404041334B1D0112295CB21\",\r\n"
+						+ "	\"tagId\":\"34161FA8202F424203ED4388\",\r\n"
+						+ "	\"tid\":\"E404041334B1D0112265CB77\",\r\n"
 						+ "	\"vehicleNumber\":\"MH02GH4645\",\r\n"
 						+ "	\"exceptionCode\":\"03\"\r\n"
 						+ "}";
 			}else if(jsonRequest.getString("requestType").equalsIgnoreCase("toRemove")) {
 				getDetails = "{\r\n"
 						+ "	\"id\":\"15\",\r\n"
-						+ "	\"tagId\":\"34161FA8202F424203ED3048\",\r\n"
-						+ "	\"tid\":\"E404041334B1D0112295CB21\",\r\n"
+						+ "	\"tagId\":\"34161FA8202F424203ED4388\",\r\n"
+						+ "	\"tid\":\"E404041334B1D0112265CB77\",\r\n"
 						+ "	\"vehicleNumber\":\"MH02GH4645\",\r\n"
 						+ "	\"exceptionCode\":\"03\",\r\n"
 						+ "	\"messageId\":\"msg_03\",\r\n"
