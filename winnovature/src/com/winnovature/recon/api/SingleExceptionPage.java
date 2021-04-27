@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,7 +17,6 @@ import org.json.JSONObject;
 
 import com.winnovature.dao.CheckSession;
 import com.winnovature.utils.DatabaseManager;
-import com.winnovature.utils.DateUtility;
 import com.winnovature.utils.MemoryComponent;
 import com.winnovature.utils.RequestReaderUtility;
 
